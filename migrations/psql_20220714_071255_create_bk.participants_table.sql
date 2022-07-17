@@ -1,6 +1,6 @@
 
 -- +migrate Up
-CREATE TABLE IF NOT EXISTS bk.participants_table(
+CREATE TABLE IF NOT EXISTS bc.participants_table(
     id uuid NOT NULL PRIMARY KEY,
     lottery_id UUID  NOT NULL,
     wallet_id UUID  NOT NULL,

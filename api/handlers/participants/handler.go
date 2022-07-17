@@ -6,7 +6,7 @@ import (
 	"bjungle-consenso/internal/helpers"
 	"bjungle-consenso/internal/logger"
 	"bjungle-consenso/internal/msg"
-	"bjungle-consenso/pkg/bk"
+	"bjungle-consenso/pkg/bc"
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -46,7 +46,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	srvBk := bk.NewServerBk(h.DB, nil, h.TxID)
+	srvBk := bc.NewServerBk(h.DB, nil, h.TxID)
 
 	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

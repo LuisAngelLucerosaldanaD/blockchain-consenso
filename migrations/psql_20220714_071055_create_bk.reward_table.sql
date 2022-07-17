@@ -1,6 +1,6 @@
 
 -- +migrate Up
-CREATE TABLE IF NOT EXISTS bk.reward_table(
+CREATE TABLE IF NOT EXISTS bc.reward_table(
     id uuid NOT NULL PRIMARY KEY,
     lottery_id UUID  NOT NULL,
     id_wallet UUID  NOT NULL,

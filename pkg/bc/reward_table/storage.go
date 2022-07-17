@@ -9,8 +9,6 @@ import (
 
 const (
 	Postgresql = "postgres"
-	SqlServer  = "sqlserver"
-	Oracle     = "oci8"
 )
 
 type ServicesRewardTableRepository interface {
@@ -25,12 +23,8 @@ func FactoryStorage(db *sqlx.DB, user *models.User, txID string) ServicesRewardT
 	var s ServicesRewardTableRepository
 	engine := db.DriverName()
 	switch engine {
-	case SqlServer:
-		return newRewardTableSqlServerRepository(db, user, txID)
 	case Postgresql:
 		return newRewardTablePsqlRepository(db, user, txID)
-	case Oracle:
-		return newRewardTableOrclRepository(db, user, txID)
 	default:
 		logger.Error.Println("el motor de base de datos no está implementado.", engine)
 	}

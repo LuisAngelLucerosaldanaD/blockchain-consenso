@@ -17,4 +17,5 @@ require (
 	github.com/lib/pq v1.10.6 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	google.golang.org/grpc v1.48.0 // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 )

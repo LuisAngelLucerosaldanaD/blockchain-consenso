@@ -9,8 +9,6 @@ import (
 
 const (
 	Postgresql = "postgres"
-	SqlServer  = "sqlserver"
-	Oracle     = "oci8"
 )
 
 type ServicesValidationTableRepository interface {
@@ -25,12 +23,8 @@ func FactoryStorage(db *sqlx.DB, user *models.User, txID string) ServicesValidat
 	var s ServicesValidationTableRepository
 	engine := db.DriverName()
 	switch engine {
-	case SqlServer:
-		return newValidationTableSqlServerRepository(db, user, txID)
 	case Postgresql:
 		return newValidationTablePsqlRepository(db, user, txID)
-	case Oracle:
-		return newValidationTableOrclRepository(db, user, txID)
 	default:
 		logger.Error.Println("el motor de base de datos no está implementado.", engine)
 	}

@@ -29,7 +29,7 @@ func (s *psql) create(m *ParticipantsTable) error {
 	date := time.Now()
 	m.UpdatedAt = date
 	m.CreatedAt = date
-	const psqlInsert = `INSERT INTO bk.participants_table (id ,lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at) VALUES (:id ,:lottery_id, :wallet_id, :amount, :accepted, :type_charge, :returned,:created_at, :updated_at) `
+	const psqlInsert = `INSERT INTO bc.participants_table (id ,lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at) VALUES (:id ,:lottery_id, :wallet_id, :amount, :accepted, :type_charge, :returned,:created_at, :updated_at) `
 	rs, err := s.DB.NamedExec(psqlInsert, &m)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (s *psql) create(m *ParticipantsTable) error {
 func (s *psql) update(m *ParticipantsTable) error {
 	date := time.Now()
 	m.UpdatedAt = date
-	const psqlUpdate = `UPDATE bk.participants_table SET lottery_id = :lottery_id, wallet_id = :wallet_id, amount = :amount, accepted = :accepted, type_charge = :type_charge, returned = :returned, updated_at = :updated_at WHERE id = :id `
+	const psqlUpdate = `UPDATE bc.participants_table SET lottery_id = :lottery_id, wallet_id = :wallet_id, amount = :amount, accepted = :accepted, type_charge = :type_charge, returned = :returned, updated_at = :updated_at WHERE id = :id `
 	rs, err := s.DB.NamedExec(psqlUpdate, &m)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (s *psql) update(m *ParticipantsTable) error {
 
 // Delete elimina un registro de la BD
 func (s *psql) delete(id string) error {
-	const psqlDelete = `DELETE FROM bk.participants_table WHERE id = :id `
+	const psqlDelete = `DELETE FROM bc.participants_table WHERE id = :id `
 	m := ParticipantsTable{ID: id}
 	rs, err := s.DB.NamedExec(psqlDelete, &m)
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *psql) delete(id string) error {
 
 // GetByID consulta un registro por su ID
 func (s *psql) getByID(id string) (*ParticipantsTable, error) {
-	const psqlGetByID = `SELECT id , lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at FROM bk.participants_table WHERE id = $1 `
+	const psqlGetByID = `SELECT id , lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at FROM bc.participants_table WHERE id = $1 `
 	mdl := ParticipantsTable{}
 	err := s.DB.Get(&mdl, psqlGetByID, id)
 	if err != nil {
@@ -85,7 +85,7 @@ func (s *psql) getByID(id string) (*ParticipantsTable, error) {
 
 // GetByID consulta un registro por su ID
 func (s *psql) getByWalletID(walletId string) (*ParticipantsTable, error) {
-	const psqlGetByWalletID = `SELECT id , lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at FROM bk.participants_table WHERE wallet_id = $1 order by id desc limit 1`
+	const psqlGetByWalletID = `SELECT id , lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at FROM bc.participants_table WHERE wallet_id = $1 order by id desc limit 1`
 	mdl := ParticipantsTable{}
 	err := s.DB.Get(&mdl, psqlGetByWalletID, walletId)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *psql) getByWalletID(walletId string) (*ParticipantsTable, error) {
 // GetAll consulta todos los registros de la BD
 func (s *psql) getAll() ([]*ParticipantsTable, error) {
 	var ms []*ParticipantsTable
-	const psqlGetAll = ` SELECT id , lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at FROM bk.participants_table `
+	const psqlGetAll = ` SELECT id , lottery_id, wallet_id, amount, accepted, type_charge, returned, created_at, updated_at FROM bc.participants_table `
 
 	err := s.DB.Select(&ms, psqlGetAll)
 	if err != nil {

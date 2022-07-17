@@ -29,7 +29,7 @@ func (s *psql) create(m *LotteryTable) error {
 	date := time.Now()
 	m.UpdatedAt = date
 	m.CreatedAt = date
-	const psqlInsert = `INSERT INTO bk.lottery_table (id ,block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at) VALUES (:id ,:block_id, :registration_start_date, :registration_end_date, :lottery_start_date, :lottery_end_date, :process_end_date, :process_status,:created_at, :updated_at) `
+	const psqlInsert = `INSERT INTO bc.lottery_table (id ,block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at) VALUES (:id ,:block_id, :registration_start_date, :registration_end_date, :lottery_start_date, :lottery_end_date, :process_end_date, :process_status,:created_at, :updated_at) `
 	rs, err := s.DB.NamedExec(psqlInsert, &m)
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (s *psql) create(m *LotteryTable) error {
 func (s *psql) update(m *LotteryTable) error {
 	date := time.Now()
 	m.UpdatedAt = date
-	const psqlUpdate = `UPDATE bk.lottery_table SET block_id = :block_id, registration_start_date = :registration_start_date, registration_end_date = :registration_end_date, lottery_start_date = :lottery_start_date, lottery_end_date = :lottery_end_date, process_end_date = :process_end_date, process_status = :process_status, updated_at = :updated_at WHERE id = :id `
+	const psqlUpdate = `UPDATE bc.lottery_table SET block_id = :block_id, registration_start_date = :registration_start_date, registration_end_date = :registration_end_date, lottery_start_date = :lottery_start_date, lottery_end_date = :lottery_end_date, process_end_date = :process_end_date, process_status = :process_status, updated_at = :updated_at WHERE id = :id `
 	rs, err := s.DB.NamedExec(psqlUpdate, &m)
 	if err != nil {
 		return err
@@ -57,7 +57,7 @@ func (s *psql) update(m *LotteryTable) error {
 
 // Delete elimina un registro de la BD
 func (s *psql) delete(id string) error {
-	const psqlDelete = `DELETE FROM bk.lottery_table WHERE id = :id `
+	const psqlDelete = `DELETE FROM bc.lottery_table WHERE id = :id `
 	m := LotteryTable{ID: id}
 	rs, err := s.DB.NamedExec(psqlDelete, &m)
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *psql) delete(id string) error {
 
 // GetByID consulta un registro por su ID
 func (s *psql) getByID(id string) (*LotteryTable, error) {
-	const psqlGetByID = `SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bk.lottery_table WHERE id = $1 `
+	const psqlGetByID = `SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bc.lottery_table WHERE id = $1 `
 	mdl := LotteryTable{}
 	err := s.DB.Get(&mdl, psqlGetByID, id)
 	if err != nil {
@@ -86,7 +86,7 @@ func (s *psql) getByID(id string) (*LotteryTable, error) {
 // GetAll consulta todos los registros de la BD
 func (s *psql) getAll() ([]*LotteryTable, error) {
 	var ms []*LotteryTable
-	const psqlGetAll = ` SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bk.lottery_table `
+	const psqlGetAll = ` SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bc.lottery_table `
 
 	err := s.DB.Select(&ms, psqlGetAll)
 	if err != nil {
@@ -99,7 +99,7 @@ func (s *psql) getAll() ([]*LotteryTable, error) {
 }
 
 func (s *psql) getActive() (*LotteryTable, error) {
-	const psqlGetByID = `SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bk.lottery_table WHERE registration_end_date = NULL AND registration_start_date <> NULL AND process_status = 25 limit 1`
+	const psqlGetByID = `SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bc.lottery_table WHERE registration_end_date = NULL AND registration_start_date <> NULL AND process_status = 25 limit 1`
 	mdl := LotteryTable{}
 	err := s.DB.Get(&mdl, psqlGetByID)
 	if err != nil {

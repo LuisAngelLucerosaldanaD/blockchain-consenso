@@ -1,11 +1,11 @@
-package bk
+package bc
 
 import (
 	"bjungle-consenso/internal/models"
-	"bjungle-consenso/pkg/bk/lottery_table"
-	"bjungle-consenso/pkg/bk/participants_table"
-	"bjungle-consenso/pkg/bk/reward_table"
-	"bjungle-consenso/pkg/bk/validation_table"
+	"bjungle-consenso/pkg/bc/lottery_table"
+	"bjungle-consenso/pkg/bc/participants_table"
+	"bjungle-consenso/pkg/bc/reward_table"
+	"bjungle-consenso/pkg/bc/validation_table"
 	"github.com/jmoiron/sqlx"
 )
 

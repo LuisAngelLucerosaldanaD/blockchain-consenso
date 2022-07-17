@@ -3,6 +3,7 @@ package reward_table
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"bjungle-consenso/internal/models"
 	"github.com/jmoiron/sqlx"
@@ -28,7 +29,7 @@ func (s *psql) create(m *RewardTable) error {
 	date := time.Now()
 	m.UpdatedAt = date
 	m.CreatedAt = date
-	const psqlInsert = `INSERT INTO bk.reward_table (id ,lottery_id, id_wallet, amount, block_id, created_at, updated_at) VALUES (:id ,:lottery_id, :id_wallet, :amount, :block_id,:created_at, :updated_at) `
+	const psqlInsert = `INSERT INTO bc.reward_table (id ,lottery_id, id_wallet, amount, block_id, created_at, updated_at) VALUES (:id ,:lottery_id, :id_wallet, :amount, :block_id,:created_at, :updated_at) `
 	rs, err := s.DB.NamedExec(psqlInsert, &m)
 	if err != nil {
 		return err
@@ -43,7 +44,7 @@ func (s *psql) create(m *RewardTable) error {
 func (s *psql) update(m *RewardTable) error {
 	date := time.Now()
 	m.UpdatedAt = date
-	const psqlUpdate = `UPDATE bk.reward_table SET lottery_id = :lottery_id, id_wallet = :id_wallet, amount = :amount, block_id = :block_id, updated_at = :updated_at WHERE id = :id `
+	const psqlUpdate = `UPDATE bc.reward_table SET lottery_id = :lottery_id, id_wallet = :id_wallet, amount = :amount, block_id = :block_id, updated_at = :updated_at WHERE id = :id `
 	rs, err := s.DB.NamedExec(psqlUpdate, &m)
 	if err != nil {
 		return err
@@ -56,7 +57,7 @@ func (s *psql) update(m *RewardTable) error {
 
 // Delete elimina un registro de la BD
 func (s *psql) delete(id string) error {
-	const psqlDelete = `DELETE FROM bk.reward_table WHERE id = :id `
+	const psqlDelete = `DELETE FROM bc.reward_table WHERE id = :id `
 	m := RewardTable{ID: id}
 	rs, err := s.DB.NamedExec(psqlDelete, &m)
 	if err != nil {
@@ -70,7 +71,7 @@ func (s *psql) delete(id string) error {
 
 // GetByID consulta un registro por su ID
 func (s *psql) getByID(id string) (*RewardTable, error) {
-	const psqlGetByID = `SELECT id , lottery_id, id_wallet, amount, block_id, created_at, updated_at FROM bk.reward_table WHERE id = $1 `
+	const psqlGetByID = `SELECT id , lottery_id, id_wallet, amount, block_id, created_at, updated_at FROM bc.reward_table WHERE id = $1 `
 	mdl := RewardTable{}
 	err := s.DB.Get(&mdl, psqlGetByID, id)
 	if err != nil {
@@ -85,7 +86,7 @@ func (s *psql) getByID(id string) (*RewardTable, error) {
 // GetAll consulta todos los registros de la BD
 func (s *psql) getAll() ([]*RewardTable, error) {
 	var ms []*RewardTable
-	const psqlGetAll = ` SELECT id , lottery_id, id_wallet, amount, block_id, created_at, updated_at FROM bk.reward_table `
+	const psqlGetAll = ` SELECT id , lottery_id, id_wallet, amount, block_id, created_at, updated_at FROM bc.reward_table `
 
 	err := s.DB.Select(&ms, psqlGetAll)
 	if err != nil {

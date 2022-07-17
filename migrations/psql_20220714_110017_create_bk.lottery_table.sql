@@ -1,6 +1,6 @@
 
 -- +migrate Up
-CREATE TABLE IF NOT EXISTS bk.lottery_table(
+CREATE TABLE IF NOT EXISTS bc.lottery_table(
     id uuid NOT NULL PRIMARY KEY,
     block_id BIGINT  NOT NULL,
     registration_start_date TIMESTAMP  NOT NULL,
