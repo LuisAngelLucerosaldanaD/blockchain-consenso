@@ -3,17 +3,19 @@ package bc
 import (
 	"bjungle-consenso/internal/models"
 	"bjungle-consenso/pkg/bc/lottery_table"
+	"bjungle-consenso/pkg/bc/miner_response"
 	"bjungle-consenso/pkg/bc/participants_table"
 	"bjungle-consenso/pkg/bc/reward_table"
-	"bjungle-consenso/pkg/bc/validation_table"
+	"bjungle-consenso/pkg/bc/validator_votes"
 	"github.com/jmoiron/sqlx"
 )
 
 type Server struct {
-	SrvLottery      lottery_table.PortsServerLotteryTable
-	SrvParticipants participants_table.PortsServerParticipantsTable
-	SrvReward       reward_table.PortsServerRewardTable
-	SrvValidation   validation_table.PortsServerValidationTable
+	SrvLottery        lottery_table.PortsServerLotteryTable
+	SrvParticipants   participants_table.PortsServerParticipantsTable
+	SrvReward         reward_table.PortsServerRewardTable
+	SrvValidatorsVote validator_votes.PortsServerValidatorVotes
+	SrvMinerResponse  miner_response.PortsServerMinerResponse
 }
 
 func NewServerBk(db *sqlx.DB, user *models.User, txID string) *Server {
@@ -27,13 +29,17 @@ func NewServerBk(db *sqlx.DB, user *models.User, txID string) *Server {
 	repoReward := reward_table.FactoryStorage(db, user, txID)
 	srvReward := reward_table.NewRewardTableService(repoReward, user, txID)
 
-	repoValidation := validation_table.FactoryStorage(db, user, txID)
-	srvValidation := validation_table.NewValidationTableService(repoValidation, user, txID)
+	repoValidatorsVote := validator_votes.FactoryStorage(db, user, txID)
+	srvValidatorsVote := validator_votes.NewValidatorVotesService(repoValidatorsVote, user, txID)
+
+	repoMinerResponse := miner_response.FactoryStorage(db, user, txID)
+	srvMinerResponse := miner_response.NewMinerResponseService(repoMinerResponse, user, txID)
 
 	return &Server{
-		SrvLottery:      srvLottery,
-		SrvParticipants: srvParticipants,
-		SrvReward:       srvReward,
-		SrvValidation:   srvValidation,
+		SrvLottery:        srvLottery,
+		SrvParticipants:   srvParticipants,
+		SrvReward:         srvReward,
+		SrvValidatorsVote: srvValidatorsVote,
+		SrvMinerResponse:  srvMinerResponse,
 	}
 }

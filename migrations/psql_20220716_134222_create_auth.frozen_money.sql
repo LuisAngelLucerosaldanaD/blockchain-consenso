@@ -9,5 +9,8 @@ CREATE TABLE IF NOT EXISTS auth.frozen_money(
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
+ALTER TABLE auth.frozen_money ADD CONSTRAINT fk_frozen_money_lottery FOREIGN KEY (lottery_id) REFERENCES bc.lottery_table(id);
+ALTER TABLE auth.frozen_money ADD CONSTRAINT fk_frozen_money_wallets FOREIGN KEY (wallet_id) REFERENCES auth.wallets(id);
+
 -- +migrate Down
 DROP TABLE IF EXISTS auth.frozen_money;

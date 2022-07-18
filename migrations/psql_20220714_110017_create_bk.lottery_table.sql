@@ -13,5 +13,7 @@ CREATE TABLE IF NOT EXISTS bc.lottery_table(
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
+ALTER TABLE bc.lottery_table ADD CONSTRAINT fk_lottery_table_process FOREIGN KEY (process_status) REFERENCES cfg.dictionaries(id);
+
 -- +migrate Down
 DROP TABLE IF EXISTS bk.lottery_table;

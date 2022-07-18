@@ -10,5 +10,8 @@ CREATE TABLE IF NOT EXISTS bc.reward_table(
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
+ALTER TABLE bc.reward_table ADD CONSTRAINT fk_reward_table_lottery FOREIGN KEY (lottery_id) REFERENCES bc.lottery_table(id);
+ALTER TABLE bc.reward_table ADD CONSTRAINT fk_reward_table_wallets FOREIGN KEY (id_wallet) REFERENCES auth.wallets(id);
+
 -- +migrate Down
 DROP TABLE IF EXISTS bk.reward_table;

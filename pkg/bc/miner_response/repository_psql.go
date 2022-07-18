@@ -1,4 +1,4 @@
-package validation_table
+package miner_response
 
 import (
 	"database/sql"
@@ -16,7 +16,7 @@ type psql struct {
 	TxID string
 }
 
-func newValidationTablePsqlRepository(db *sqlx.DB, user *models.User, txID string) *psql {
+func newMinerResponsePsqlRepository(db *sqlx.DB, user *models.User, txID string) *psql {
 	return &psql{
 		DB:   db,
 		user: user,
@@ -25,11 +25,11 @@ func newValidationTablePsqlRepository(db *sqlx.DB, user *models.User, txID strin
 }
 
 // Create registra en la BD
-func (s *psql) create(m *ValidationTable) error {
+func (s *psql) create(m *MinerResponse) error {
 	date := time.Now()
 	m.UpdatedAt = date
 	m.CreatedAt = date
-	const psqlInsert = `INSERT INTO bc.validation_table (id ,lottery_id, wallet_id, participants_id, vote, created_at, updated_at) VALUES (:id ,:lottery_id, :wallet_id, :participants_id, :vote,:created_at, :updated_at) `
+	const psqlInsert = `INSERT INTO bc.miner_response (id ,lottery_id, participants_id, hash, created_at, updated_at) VALUES (:id ,:lottery_id, :participants_id, :hash,:created_at, :updated_at) `
 	rs, err := s.DB.NamedExec(psqlInsert, &m)
 	if err != nil {
 		return err
@@ -41,10 +41,10 @@ func (s *psql) create(m *ValidationTable) error {
 }
 
 // Update actualiza un registro en la BD
-func (s *psql) update(m *ValidationTable) error {
+func (s *psql) update(m *MinerResponse) error {
 	date := time.Now()
 	m.UpdatedAt = date
-	const psqlUpdate = `UPDATE bc.validation_table SET lottery_id = :lottery_id, wallet_id = :wallet_id, participants_id = :participants_id, vote = :vote, updated_at = :updated_at WHERE id = :id `
+	const psqlUpdate = `UPDATE bc.miner_response SET lottery_id = :lottery_id, participants_id = :participants_id, hash = :hash, updated_at = :updated_at WHERE id = :id `
 	rs, err := s.DB.NamedExec(psqlUpdate, &m)
 	if err != nil {
 		return err
@@ -57,8 +57,8 @@ func (s *psql) update(m *ValidationTable) error {
 
 // Delete elimina un registro de la BD
 func (s *psql) delete(id string) error {
-	const psqlDelete = `DELETE FROM bc.validation_table WHERE id = :id `
-	m := ValidationTable{ID: id}
+	const psqlDelete = `DELETE FROM bc.miner_response WHERE id = :id `
+	m := MinerResponse{ID: id}
 	rs, err := s.DB.NamedExec(psqlDelete, &m)
 	if err != nil {
 		return err
@@ -70,9 +70,9 @@ func (s *psql) delete(id string) error {
 }
 
 // GetByID consulta un registro por su ID
-func (s *psql) getByID(id string) (*ValidationTable, error) {
-	const psqlGetByID = `SELECT id , lottery_id, wallet_id, participants_id, vote, created_at, updated_at FROM bc.validation_table WHERE id = $1 `
-	mdl := ValidationTable{}
+func (s *psql) getByID(id string) (*MinerResponse, error) {
+	const psqlGetByID = `SELECT id , lottery_id, participants_id, hash, created_at, updated_at FROM bc.miner_response WHERE id = $1 `
+	mdl := MinerResponse{}
 	err := s.DB.Get(&mdl, psqlGetByID, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -84,9 +84,9 @@ func (s *psql) getByID(id string) (*ValidationTable, error) {
 }
 
 // GetAll consulta todos los registros de la BD
-func (s *psql) getAll() ([]*ValidationTable, error) {
-	var ms []*ValidationTable
-	const psqlGetAll = ` SELECT id , lottery_id, wallet_id, participants_id, vote, created_at, updated_at FROM bc.validation_table `
+func (s *psql) getAll() ([]*MinerResponse, error) {
+	var ms []*MinerResponse
+	const psqlGetAll = ` SELECT id , lottery_id, participants_id, hash, created_at, updated_at FROM bc.miner_response `
 
 	err := s.DB.Select(&ms, psqlGetAll)
 	if err != nil {
