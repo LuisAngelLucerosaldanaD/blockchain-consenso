@@ -9,11 +9,12 @@ import (
 )
 
 type PortsServerValidatorVotes interface {
-	CreateValidatorVotes(id string, walletId string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error)
-	UpdateValidatorVotes(id string, walletId string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error)
+	CreateValidatorVotes(id string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error)
+	UpdateValidatorVotes(id string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error)
 	DeleteValidatorVotes(id string) (int, error)
 	GetValidatorVotesByID(id string) (*ValidatorVotes, int, error)
 	GetAllValidatorVotes() ([]*ValidatorVotes, error)
+	GetAllValidatorVotesByLotteryID(lotteryID string) ([]*ValidatorVotes, error)
 }
 
 type service struct {
@@ -26,8 +27,8 @@ func NewValidatorVotesService(repository ServicesValidatorVotesRepository, user 
 	return &service{repository: repository, user: user, txID: TxID}
 }
 
-func (s *service) CreateValidatorVotes(id string, walletId string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error) {
-	m := NewValidatorVotes(id, walletId, lotteryId, participantsId, hash, vote)
+func (s *service) CreateValidatorVotes(id string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error) {
+	m := NewValidatorVotes(id, lotteryId, participantsId, hash, vote)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)
 		return m, 15, err
@@ -43,8 +44,8 @@ func (s *service) CreateValidatorVotes(id string, walletId string, lotteryId str
 	return m, 29, nil
 }
 
-func (s *service) UpdateValidatorVotes(id string, walletId string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error) {
-	m := NewValidatorVotes(id, walletId, lotteryId, participantsId, hash, vote)
+func (s *service) UpdateValidatorVotes(id string, lotteryId string, participantsId string, hash string, vote bool) (*ValidatorVotes, int, error) {
+	m := NewValidatorVotes(id, lotteryId, participantsId, hash, vote)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)
 		return m, 15, err
@@ -87,4 +88,8 @@ func (s *service) GetValidatorVotesByID(id string) (*ValidatorVotes, int, error)
 
 func (s *service) GetAllValidatorVotes() ([]*ValidatorVotes, error) {
 	return s.repository.getAll()
+}
+
+func (s *service) GetAllValidatorVotesByLotteryID(lotteryID string) ([]*ValidatorVotes, error) {
+	return s.repository.getByLotteryID(lotteryID)
 }

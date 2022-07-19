@@ -1,4 +1,4 @@
-package participants_table
+package participants
 
 import (
 	"time"
@@ -7,7 +7,7 @@ import (
 )
 
 // Model estructura de ParticipantsTable
-type ParticipantsTable struct {
+type Participants struct {
 	ID         string    `json:"id" db:"id" valid:"required,uuid"`
 	LotteryId  string    `json:"lottery_id" db:"lottery_id" valid:"required"`
 	WalletId   string    `json:"wallet_id" db:"wallet_id" valid:"required"`
@@ -19,8 +19,8 @@ type ParticipantsTable struct {
 	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
-func NewParticipantsTable(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) *ParticipantsTable {
-	return &ParticipantsTable{
+func NewParticipants(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) *Participants {
+	return &Participants{
 		ID:         id,
 		LotteryId:  lotteryId,
 		WalletId:   walletId,
@@ -31,7 +31,7 @@ func NewParticipantsTable(id string, lotteryId string, walletId string, amount i
 	}
 }
 
-func (m *ParticipantsTable) valid() (bool, error) {
+func (m *Participants) valid() (bool, error) {
 	result, err := govalidator.ValidateStruct(m)
 	if err != nil {
 		return result, err

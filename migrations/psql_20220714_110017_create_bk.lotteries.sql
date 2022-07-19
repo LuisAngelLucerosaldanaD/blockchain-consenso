@@ -1,6 +1,6 @@
 
 -- +migrate Up
-CREATE TABLE IF NOT EXISTS bc.lottery_table(
+CREATE TABLE IF NOT EXISTS bc.lotteries(
     id uuid NOT NULL PRIMARY KEY,
     block_id BIGINT  NOT NULL,
     registration_start_date TIMESTAMP  NOT NULL,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS bc.lottery_table(
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );
 
-ALTER TABLE bc.lottery_table ADD CONSTRAINT fk_lottery_table_process FOREIGN KEY (process_status) REFERENCES cfg.dictionaries(id);
+ALTER TABLE bc.lotteries ADD CONSTRAINT fk_lotteries_process FOREIGN KEY (process_status) REFERENCES cfg.dictionaries(id);
 
 -- +migrate Down
-DROP TABLE IF EXISTS bk.lottery_table;
+DROP TABLE IF EXISTS bc.lottery_table;

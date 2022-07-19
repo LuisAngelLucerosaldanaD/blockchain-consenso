@@ -17,6 +17,7 @@ type ServicesMinerResponseRepository interface {
 	delete(id string) error
 	getByID(id string) (*MinerResponse, error)
 	getAll() ([]*MinerResponse, error)
+	getRegister(lotteryId string) (*MinerResponse, error)
 }
 
 func FactoryStorage(db *sqlx.DB, user *models.User, txID string) ServicesMinerResponseRepository {

@@ -9,11 +9,12 @@ import (
 )
 
 type PortsServerMinerResponse interface {
-	CreateMinerResponse(id string, lotteryId string, participantsId string, hash string) (*MinerResponse, int, error)
-	UpdateMinerResponse(id string, lotteryId string, participantsId string, hash string) (*MinerResponse, int, error)
+	CreateMinerResponse(id string, lotteryId string, participantsId string, hash string, status int, nonce int64, difficulty int) (*MinerResponse, int, error)
+	UpdateMinerResponse(id string, lotteryId string, participantsId string, hash string, status int, nonce int64, difficulty int) (*MinerResponse, int, error)
 	DeleteMinerResponse(id string) (int, error)
 	GetMinerResponseByID(id string) (*MinerResponse, int, error)
 	GetAllMinerResponse() ([]*MinerResponse, error)
+	GetMinerResponseRegister(lotteryID string) (*MinerResponse, int, error)
 }
 
 type service struct {
@@ -26,8 +27,8 @@ func NewMinerResponseService(repository ServicesMinerResponseRepository, user *m
 	return &service{repository: repository, user: user, txID: TxID}
 }
 
-func (s *service) CreateMinerResponse(id string, lotteryId string, participantsId string, hash string) (*MinerResponse, int, error) {
-	m := NewMinerResponse(id, lotteryId, participantsId, hash)
+func (s *service) CreateMinerResponse(id string, lotteryId string, participantsId string, hash string, status int, nonce int64, difficulty int) (*MinerResponse, int, error) {
+	m := NewMinerResponse(id, lotteryId, participantsId, hash, status, nonce, difficulty)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)
 		return m, 15, err
@@ -43,8 +44,8 @@ func (s *service) CreateMinerResponse(id string, lotteryId string, participantsI
 	return m, 29, nil
 }
 
-func (s *service) UpdateMinerResponse(id string, lotteryId string, participantsId string, hash string) (*MinerResponse, int, error) {
-	m := NewMinerResponse(id, lotteryId, participantsId, hash)
+func (s *service) UpdateMinerResponse(id string, lotteryId string, participantsId string, hash string, status int, nonce int64, difficulty int) (*MinerResponse, int, error) {
+	m := NewMinerResponse(id, lotteryId, participantsId, hash, status, nonce, difficulty)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)
 		return m, 15, err
@@ -80,6 +81,19 @@ func (s *service) GetMinerResponseByID(id string) (*MinerResponse, int, error) {
 	m, err := s.repository.getByID(id)
 	if err != nil {
 		logger.Error.Println(s.txID, " - couldn`t getByID row:", err)
+		return nil, 22, err
+	}
+	return m, 29, nil
+}
+
+func (s *service) GetMinerResponseRegister(lotteryID string) (*MinerResponse, int, error) {
+	if !govalidator.IsUUID(lotteryID) {
+		logger.Error.Println(s.txID, " - don't meet validations:", fmt.Errorf("lottery id isn't uuid"))
+		return nil, 15, fmt.Errorf("lottery id isn't uuid")
+	}
+	m, err := s.repository.getRegister(lotteryID)
+	if err != nil {
+		logger.Error.Println(s.txID, " - couldn`t getRegister row:", err)
 		return nil, 22, err
 	}
 	return m, 29, nil

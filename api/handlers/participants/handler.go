@@ -8,6 +8,7 @@ import (
 	"bjungle-consenso/internal/msg"
 	"bjungle-consenso/pkg/bc"
 	"context"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
@@ -36,6 +37,12 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	if request.Amount <= 0 {
 		logger.Error.Printf("el monto de acais debe ser mayo que 0")
 		res.Code, res.Type, res.Msg = 22, 1, "el monto de acais debe ser mayo que 0"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if request.Amount < e.App.MinimumFee {
+		logger.Error.Printf("el monto de acais superar a la cuata minima de ingreso")
+		res.Code, res.Type, res.Msg = 22, 1, fmt.Sprintf("el monto de acais superar a la cuata minima de ingreso, monto minimo: %d", e.App.MinimumFee)
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
@@ -86,7 +93,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	participant, code, err := srvBk.SrvParticipants.GetParticipantsTableByWalletID(resWallet.Data[0].Id)
+	participant, code, err := srvBk.SrvParticipants.GetParticipantsByWalletID(resWallet.Data[0].Id)
 	if err != nil {
 		logger.Error.Printf("couldn't get participant by wallet id, error: %s", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -101,7 +108,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 			return c.Status(http.StatusAccepted).JSON(res)
 		}
 
-		_, code, err = srvBk.SrvParticipants.CreateParticipantsTable(uuid.New().String(), lotteryActive.ID, resWallet.Data[0].Id, request.Amount, false, 21, false)
+		_, code, err = srvBk.SrvParticipants.CreateParticipants(uuid.New().String(), lotteryActive.ID, resWallet.Data[0].Id, request.Amount, false, 21, false)
 		if err != nil {
 			logger.Error.Printf("couldn't get active lottery, error: %s", err)
 			res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -113,7 +120,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusOK).JSON(res)
 	}
 
-	lottery, code, err := srvBk.SrvLottery.GetLotteryTableByID(participant.LotteryId)
+	lottery, code, err := srvBk.SrvLottery.GetLotteryByID(participant.LotteryId)
 	if err != nil {
 		logger.Error.Printf("couldn't validate participant, error: %s", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -133,7 +140,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	_, code, err = srvBk.SrvParticipants.CreateParticipantsTable(uuid.New().String(), lotteryActive.ID, resWallet.Data[0].Id, request.Amount, false, 21, false)
+	_, code, err = srvBk.SrvParticipants.CreateParticipants(uuid.New().String(), lotteryActive.ID, resWallet.Data[0].Id, request.Amount, false, 21, false)
 	if err != nil {
 		logger.Error.Printf("couldn't get active lottery, error: %s", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)

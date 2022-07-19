@@ -9,7 +9,6 @@ import (
 // Model estructura de ValidatorVotes
 type ValidatorVotes struct {
 	ID             string    `json:"id" db:"id" valid:"required,uuid"`
-	WalletId       string    `json:"wallet_id" db:"wallet_id" valid:"required"`
 	LotteryId      string    `json:"lottery_id" db:"lottery_id" valid:"required"`
 	ParticipantsId string    `json:"participants_id" db:"participants_id" valid:"required"`
 	Hash           string    `json:"hash" db:"hash" valid:"required"`
@@ -18,10 +17,9 @@ type ValidatorVotes struct {
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }
 
-func NewValidatorVotes(id string, walletId string, lotteryId string, participantsId string, hash string, vote bool) *ValidatorVotes {
+func NewValidatorVotes(id string, lotteryId string, participantsId string, hash string, vote bool) *ValidatorVotes {
 	return &ValidatorVotes{
 		ID:             id,
-		WalletId:       walletId,
 		LotteryId:      lotteryId,
 		ParticipantsId: participantsId,
 		Hash:           hash,
