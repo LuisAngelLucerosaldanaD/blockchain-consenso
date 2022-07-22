@@ -99,12 +99,12 @@ func (s *psql) getAll() ([]*Lottery, error) {
 }
 
 func (s *psql) getActive() (*Lottery, error) {
-	const psqlGetByID = `SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bc.lotteries WHERE registration_end_date = NULL AND registration_start_date <> NULL AND process_status = 25 limit 1`
+	const psqlGetByID = `SELECT id , block_id, registration_start_date, registration_end_date, lottery_start_date, lottery_end_date, process_end_date, process_status, created_at, updated_at FROM bc.lotteries WHERE process_status = 25 limit 1`
 	mdl := Lottery{}
 	err := s.DB.Get(&mdl, psqlGetByID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("no hay sorteos activos actualmente")
+			return nil, nil
 		}
 		return &mdl, err
 	}
@@ -117,7 +117,7 @@ func (s *psql) getActiveForMined() (*Lottery, error) {
 	err := s.DB.Get(&mdl, psqlGetByID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("no hay sorteos activos actualmente")
+			return nil, nil
 		}
 		return &mdl, err
 	}

@@ -3,6 +3,7 @@ package api
 import (
 	"bjungle-consenso/api/handlers/miner"
 	"bjungle-consenso/api/handlers/participants"
+	"bjungle-consenso/api/handlers/validator"
 	"github.com/ansrivas/fiberprometheus/v2"
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
@@ -54,4 +55,5 @@ func routes(db *sqlx.DB, loggerHttp bool, allowedOrigins string) *fiber.App {
 func loadRoutes(app *fiber.App, db *sqlx.DB, TxID string) {
 	participants.RouterParticipants(app, db, TxID)
 	miner.RouterMiner(app, db, TxID)
+	validator.RouterValidators(app, db, TxID)
 }

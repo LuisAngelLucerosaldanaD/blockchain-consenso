@@ -11,3 +11,16 @@ type responseRegisterParticipant struct {
 type requestRegisterParticipant struct {
 	Amount int64 `json:"amount"`
 }
+
+type resParticipant struct {
+	Error bool             `json:"error"`
+	Data  *InfoParticipant `json:"data"`
+	Code  int              `json:"code"`
+	Type  int              `json:"type"`
+	Msg   string           `json:"msg"`
+}
+
+type InfoParticipant struct {
+	Accepted bool `json:"accepted"`
+	Charge   int  `json:"charge"`
+}

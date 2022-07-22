@@ -11,4 +11,5 @@ func RouterMiner(app *fiber.App, db *sqlx.DB, txID string) {
 	v1 := api.Group("/v1")
 	partRouter := v1.Group("/miner")
 	partRouter.Post("/register-mined", h.RegisterHashMined)
+	partRouter.Get("/block-to-mine", h.GetBlockToMine)
 }

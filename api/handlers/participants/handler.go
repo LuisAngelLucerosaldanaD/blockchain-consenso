@@ -2,6 +2,7 @@ package participants
 
 import (
 	"bjungle-consenso/internal/env"
+	"bjungle-consenso/internal/grpc/accounting_proto"
 	"bjungle-consenso/internal/grpc/wallet_proto"
 	"bjungle-consenso/internal/helpers"
 	"bjungle-consenso/internal/logger"
@@ -25,11 +26,18 @@ type handlerParticipant struct {
 
 func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
-	res := responseRegisterParticipant{}
+	res := responseRegisterParticipant{Error: true}
 	request := requestRegisterParticipant{}
 	err := c.BodyParser(&request)
 	if err != nil {
 		logger.Error.Printf("couldn't bind model requestRegisterParticipant: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	u, err := helpers.GetUserContextV2(c)
+	if err != nil {
+		logger.Error.Printf("couldn't get user token: %v", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
@@ -46,13 +54,6 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	u, err := helpers.GetUserContextV2(c)
-	if err != nil {
-		logger.Error.Printf("couldn't get user token: %v", err)
-		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
 	srvBk := bc.NewServerBk(h.DB, nil, h.TxID)
 
 	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -64,6 +65,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	defer connAuth.Close()
 
 	clientWallet := wallet_proto.NewWalletServicesWalletClient(connAuth)
+	clientAccount := accounting_proto.NewAccountingServicesAccountingClient(connAuth)
 
 	token := c.Get("Authorization")[7:]
 	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", token)
@@ -93,6 +95,31 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
+	resAccount, err := clientAccount.GetAccountingByWalletById(ctx, &accounting_proto.RequestGetAccountingByWalletId{Id: resWallet.Data[0].Id})
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio account de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio account de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resAccount == nil {
+		logger.Error.Printf("error conectando con el servicio account de blockchain")
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio account de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resAccount.Error {
+		logger.Error.Printf(resAccount.Msg)
+		res.Code, res.Type, res.Msg = int(resAccount.Code), int(resAccount.Type), resAccount.Msg
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if float64(request.Amount) > resAccount.Data.Amount {
+		logger.Error.Printf("el dinero ingresado es mayor a la cantidad de acais que tiene actualmente")
+		res.Code, res.Type, res.Msg = 22, 1, "el dinero ingresado es mayor a la cantidad de acais que tiene actualmente"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
 	participant, code, err := srvBk.SrvParticipants.GetParticipantsByWalletID(resWallet.Data[0].Id)
 	if err != nil {
 		logger.Error.Printf("couldn't get participant by wallet id, error: %s", err)
@@ -114,6 +141,30 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 			res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
 			return c.Status(http.StatusAccepted).JSON(res)
 		}
+
+		resFrozen, err := clientWallet.FrozenMoney(ctx, &wallet_proto.RqFrozenMoney{
+			WalletId:  resWallet.Data[0].Id,
+			Amount:    request.Amount,
+			LotteryId: lotteryActive.ID,
+		})
+		if err != nil {
+			logger.Error.Printf("couldn't frozen money, error: %s", err)
+			res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+			return c.Status(http.StatusAccepted).JSON(res)
+		}
+
+		if resFrozen == nil {
+			logger.Error.Printf("couldn't frozen money")
+			res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+			return c.Status(http.StatusAccepted).JSON(res)
+		}
+
+		if resFrozen.Error {
+			logger.Error.Printf(resFrozen.Msg)
+			res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+			return c.Status(http.StatusAccepted).JSON(res)
+		}
+
 		res.Data = "inscrito correctamente"
 		res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 		res.Error = false
@@ -128,9 +179,8 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	}
 
 	if lottery != nil && lottery.RegistrationEndDate == nil && lottery.LotteryEndDate == nil && lottery.ProcessEndDate == nil {
-		logger.Error.Printf("couldn't registration user, error: %s", err)
-		res.Code, res.Type, res.Msg = 22, 1, "El usuario ya se encuentra a un sorteo pendiente"
-		return c.Status(http.StatusAccepted).JSON(res)
+		res.Code, res.Type, res.Msg = 22, 1, "El usuario ya se encuentra resgistrado a un sorteo pendiente"
+		return c.Status(http.StatusOK).JSON(res)
 	}
 
 	lotteryActive, code, err := srvBk.SrvLottery.GetLotteryActive()
@@ -173,5 +223,36 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	res.Data = "inscrito correctamente"
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
+
+func (h *handlerParticipant) GetInfoParticipant(c *fiber.Ctx) error {
+	res := resParticipant{Error: true}
+	srvBk := bc.NewServerBk(h.DB, nil, h.TxID)
+	walletId := c.Params("wallet")
+	participant, code, err := srvBk.SrvParticipants.GetParticipantsByWalletID(walletId)
+	if err != nil {
+		logger.Error.Printf("error trayendo el participante por wallet id, error: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if participant == nil {
+		res.Error = false
+		res.Data = &InfoParticipant{
+			Accepted: false,
+			Charge:   21,
+		}
+		res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+		return c.Status(http.StatusOK).JSON(res)
+	}
+
+	res.Error = false
+	res.Data = &InfoParticipant{
+		Accepted: participant.Accepted,
+		Charge:   participant.TypeCharge,
+	}
+
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	return c.Status(http.StatusOK).JSON(res)
 }
