@@ -178,7 +178,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	if lottery != nil && lottery.RegistrationEndDate == nil && lottery.LotteryEndDate == nil && lottery.ProcessEndDate == nil {
+	if lottery != nil && lottery.ProcessStatus != 28 && lottery.ProcessStatus != 32 {
 		res.Code, res.Type, res.Msg = 22, 1, "El usuario ya se encuentra resgistrado a un sorteo pendiente"
 		return c.Status(http.StatusOK).JSON(res)
 	}
