@@ -77,3 +77,14 @@ type responseAnny struct {
 type requestActivateUser struct {
 	Code string `json:"code"`
 }
+
+type ReqChangePwd struct {
+	Email    string `json:"email"`
+	Nickname string `json:"nickname"`
+}
+
+type ChangePwd struct {
+	OldPassword     string `json:"old_password"`
+	NewPassword     string `json:"new_password"`
+	ConfirmPassword string `json:"confirm_password"`
+}

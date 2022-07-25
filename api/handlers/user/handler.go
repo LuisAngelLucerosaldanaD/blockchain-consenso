@@ -290,3 +290,105 @@ func (h *handlerUser) activateUser(c *fiber.Ctx) error {
 	res.Error = false
 	return c.Status(http.StatusOK).JSON(res)
 }
+
+func (h *handlerUser) RequestChangePwd(c *fiber.Ctx) error {
+	res := responseAnny{Error: true}
+	e := env.NewConfiguration()
+	request := ReqChangePwd{}
+	err := c.BodyParser(&request)
+	if err != nil {
+		logger.Error.Printf("couldn't bind model create wallets: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+	defer connAuth.Close()
+
+	clientUser := users_proto.NewAuthServicesUsersClient(connAuth)
+
+	resActivate, err := clientUser.RequestChangePassword(context.Background(), &users_proto.RqChangePwd{
+		Email:    request.Email,
+		Nickname: request.Nickname,
+	})
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resActivate == nil {
+		logger.Error.Printf("No se pudo solicitar el cambio de contraseña: %v", err)
+		res.Code, res.Type, res.Msg = 22, 1, "No se pudo solicitar el cambio de contraseña"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resActivate.Error {
+		logger.Error.Printf(resActivate.Msg)
+		res.Code, res.Type, res.Msg = int(resActivate.Code), int(resActivate.Type), resActivate.Msg
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Data = "Se ha enviado un correo para que pueda restablecer su contraseña"
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
+
+func (h *handlerUser) ChangePassword(c *fiber.Ctx) error {
+	res := responseAnny{Error: true}
+	e := env.NewConfiguration()
+	request := ChangePwd{}
+	err := c.BodyParser(&request)
+	if err != nil {
+		logger.Error.Printf("couldn't bind model create wallets: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+	defer connAuth.Close()
+
+	clientUser := users_proto.NewAuthServicesUsersClient(connAuth)
+
+	token := c.Get("Authorization")[7:]
+	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", token)
+
+	resActivate, err := clientUser.ChangePassword(ctx, &users_proto.RequestChangePwd{
+		OldPassword:     request.OldPassword,
+		NewPassword:     request.NewPassword,
+		ConfirmPassword: request.ConfirmPassword,
+	})
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resActivate == nil {
+		logger.Error.Printf("No se pudo realizar el cambio de contraseña: %v", err)
+		res.Code, res.Type, res.Msg = 22, 1, "No se pudo realizar el cambio de contraseña"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resActivate.Error {
+		logger.Error.Printf(resActivate.Msg)
+		res.Code, res.Type, res.Msg = int(resActivate.Code), int(resActivate.Type), resActivate.Msg
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Data = "Se ha cambiado correctamente la contraseña"
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
