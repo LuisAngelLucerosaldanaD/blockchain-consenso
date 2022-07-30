@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS bc.rewards(
     id uuid NOT NULL PRIMARY KEY,
     lottery_id UUID  NOT NULL,
     id_wallet UUID  NOT NULL,
-    amount BIGINT  NOT NULL,
+    amount float8  NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP NOT NULL DEFAULT now()
 );

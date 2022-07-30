@@ -9,8 +9,8 @@ import (
 )
 
 type PortsServerRewards interface {
-	CreateReward(id string, lotteryId string, idWallet string, amount int64) (*Reward, int, error)
-	UpdateReward(id string, lotteryId string, idWallet string, amount int64) (*Reward, int, error)
+	CreateReward(id string, lotteryId string, idWallet string, amount float64) (*Reward, int, error)
+	UpdateReward(id string, lotteryId string, idWallet string, amount float64) (*Reward, int, error)
 	DeleteReward(id string) (int, error)
 	GetRewardByID(id string) (*Reward, int, error)
 	GetAllReward() ([]*Reward, error)
@@ -26,7 +26,7 @@ func NewRewardsService(repository ServicesRewardsRepository, user *models.User, 
 	return &service{repository: repository, user: user, txID: TxID}
 }
 
-func (s *service) CreateReward(id string, lotteryId string, idWallet string, amount int64) (*Reward, int, error) {
+func (s *service) CreateReward(id string, lotteryId string, idWallet string, amount float64) (*Reward, int, error) {
 	m := NewReward(id, lotteryId, idWallet, amount)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)
@@ -43,7 +43,7 @@ func (s *service) CreateReward(id string, lotteryId string, idWallet string, amo
 	return m, 29, nil
 }
 
-func (s *service) UpdateReward(id string, lotteryId string, idWallet string, amount int64) (*Reward, int, error) {
+func (s *service) UpdateReward(id string, lotteryId string, idWallet string, amount float64) (*Reward, int, error) {
 	m := NewReward(id, lotteryId, idWallet, amount)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)

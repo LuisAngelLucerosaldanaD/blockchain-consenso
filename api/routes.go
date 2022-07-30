@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bjungle-consenso/api/handlers/blocks"
 	"bjungle-consenso/api/handlers/miner"
 	"bjungle-consenso/api/handlers/participants"
 	"bjungle-consenso/api/handlers/user"
@@ -58,4 +59,5 @@ func loadRoutes(app *fiber.App, db *sqlx.DB, TxID string) {
 	miner.RouterMiner(app, db, TxID)
 	validator.RouterValidators(app, db, TxID)
 	user.RouterUser(app, db, TxID)
+	blocks.RouterBlocks(app, db, TxID)
 }

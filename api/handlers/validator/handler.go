@@ -73,7 +73,7 @@ func (h *handlerValidators) RegisterVoteValidator(c *fiber.Ctx) error {
 
 	vote := hashMined.Hash == request.Hash
 
-	_, code, err = srvBc.SrvValidatorsVote.CreateValidatorVotes(uuid.New().String(), "", participant.ID, request.Hash, vote)
+	_, code, err = srvBc.SrvValidatorsVote.CreateValidatorVotes(uuid.New().String(), hashMined.LotteryId, participant.ID, request.Hash, vote)
 	if err != nil {
 		logger.Error.Printf("couldn't create vote of validator: %v", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)

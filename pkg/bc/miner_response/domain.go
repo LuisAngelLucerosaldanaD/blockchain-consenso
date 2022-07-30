@@ -13,8 +13,8 @@ type MinerResponse struct {
 	ParticipantsId string    `json:"participants_id" db:"participants_id" valid:"required"`
 	Hash           string    `json:"hash" db:"hash" valid:"required"`
 	Status         int       `json:"status" db:"status" valid:"required"`
-	Nonce          int64     `json:"nonce"`
-	Difficulty     int       `json:"difficulty"`
+	Nonce          int64     `json:"nonce" db:"nonce" valid:"required"`
+	Difficulty     int       `json:"difficulty" db:"difficulty" valid:"required"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }

@@ -24,7 +24,6 @@ type handlerMiner struct {
 func (h *handlerMiner) RegisterHashMined(c *fiber.Ctx) error {
 	res := responseRegisterMined{Error: true}
 	request := rqRegisterMined{}
-	e := env.NewConfiguration()
 	err := c.BodyParser(&request)
 	if err != nil {
 		logger.Error.Printf("couldn't bind model rqRegisterMined: %v", err)
@@ -73,7 +72,7 @@ func (h *handlerMiner) RegisterHashMined(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	_, code, err = srvBc.SrvMinerResponse.CreateMinerResponse(uuid.New().String(), lottery.ID, participant.ID, request.Hash, 29, request.Nonce, e.App.Difficulty)
+	_, code, err = srvBc.SrvMinerResponse.CreateMinerResponse(uuid.New().String(), lottery.ID, participant.ID, request.Hash, 29, request.Nonce, request.Difficulty)
 	if err != nil {
 		logger.Error.Printf("couldn't register hash, error: %v", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -124,10 +123,42 @@ func (h *handlerMiner) GetBlockToMine(c *fiber.Ctx) error {
 	res.Data = &DataBlockToMine{
 		ID:         block.Id,
 		PrevHash:   block.PrevHash,
-		Difficulty: e.App.Difficulty,
+		Difficulty: int(block.Difficulty),
 		Cuota:      float64(e.App.MinimumFee),
 	}
 	res.Error = false
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+	return c.Status(http.StatusOK).JSON(res)
+}
+
+func (h *handlerMiner) GetHashMined(c *fiber.Ctx) error {
+
+	res := responseHashMined{Error: true}
+
+	srvBc := bc.NewServerBk(h.DB, nil, h.TxID)
+
+	lottery, code, err := srvBc.SrvLottery.GetLotteryActiveForMined()
+	if err != nil {
+		logger.Error.Printf("couldn't get lottery for mined: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	hashMined, code, err := srvBc.SrvMinerResponse.GetMinerResponseRegister(lottery.ID)
+	if err != nil {
+		logger.Error.Printf("couldn't get hash mined: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if hashMined == nil {
+		logger.Error.Printf("El hash aun no ha sido resuelto por ningun minero")
+		res.Code, res.Type, res.Msg = 22, 1, "El hash aun no ha sido resuelto por ningun minero"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Data = hashMined
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+	res.Error = false
 	return c.Status(http.StatusOK).JSON(res)
 }

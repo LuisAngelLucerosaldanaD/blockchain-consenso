@@ -11,12 +11,12 @@ type Reward struct {
 	ID        string    `json:"id" db:"id" valid:"required,uuid"`
 	LotteryId string    `json:"lottery_id" db:"lottery_id" valid:"required"`
 	IdWallet  string    `json:"id_wallet" db:"id_wallet" valid:"required"`
-	Amount    int64     `json:"amount" db:"amount" valid:"required"`
+	Amount    float64   `json:"amount" db:"amount" valid:"required"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
-func NewReward(id string, lotteryId string, idWallet string, amount int64) *Reward {
+func NewReward(id string, lotteryId string, idWallet string, amount float64) *Reward {
 	return &Reward{
 		ID:        id,
 		LotteryId: lotteryId,
