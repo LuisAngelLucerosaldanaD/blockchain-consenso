@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type handlerBlocks struct {
@@ -56,21 +57,30 @@ func (h *handlerBlocks) GetAllBlocks(c *fiber.Ctx) error {
 
 	var blocks []*Block
 	for _, block := range resBlocks.Data {
+
+		layout := "2006-01-02 15:04:05.999999999 -0700 MST"
+
+		timestamp, _ := time.Parse(layout, block.Timestamp)
+		createdAt, _ := time.Parse(layout, block.CreatedAt)
+		updatedAt, _ := time.Parse(layout, block.UpdatedAt)
+		minedAt, _ := time.Parse(layout, block.MinedAt)
+		lastValidationDate, _ := time.Parse(layout, block.LastValidationDate)
+
 		blocks = append(blocks, &Block{
 			Id:                 block.Id,
 			Data:               block.Data,
 			Nonce:              block.Nonce,
 			Difficulty:         block.Difficulty,
-			MinedBy:            block.MinedAt,
-			MinedAt:            block.MinedAt,
-			Timestamp:          block.Timestamp,
+			MinedBy:            block.MinedBy,
+			MinedAt:            minedAt,
+			Timestamp:          timestamp,
 			Hash:               block.Hash,
 			PrevHash:           block.PrevHash,
 			StatusId:           block.StatusId,
 			IdUser:             block.IdUser,
-			LastValidationDate: block.LastValidationDate,
-			CreatedAt:          block.CreatedAt,
-			UpdatedAt:          block.UpdatedAt,
+			LastValidationDate: lastValidationDate,
+			CreatedAt:          createdAt,
+			UpdatedAt:          updatedAt,
 		})
 	}
 

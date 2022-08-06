@@ -11,6 +11,7 @@ import (
 	"bjungle-consenso/internal/msg"
 	"context"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -227,6 +228,69 @@ func (h *handlerUser) GetFreezeMoney(c *fiber.Ctx) error {
 	}
 
 	res.Data = resFrozen.Data
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
+
+func (h *handlerUser) CreateUser(c *fiber.Ctx) error {
+	res := responseAnny{Error: true}
+	request := requestCreateUser{}
+	e := env.NewConfiguration()
+	err := c.BodyParser(&request)
+	if err != nil {
+		logger.Error.Printf("couldn't bind model request: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if request.Password != request.ConfirmPassword {
+		res.Code, res.Type, res.Msg = 22, 1, "La contraseña no conincide con la contra"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+	defer connAuth.Close()
+
+	clientUser := users_proto.NewAuthServicesUsersClient(connAuth)
+
+	resCreateUser, err := clientUser.CreateUser(context.Background(), &users_proto.UserRequest{
+		Id:              uuid.New().String(),
+		Nickname:        request.Nickname,
+		Email:           request.Email,
+		Password:        request.Password,
+		ConfirmPassword: request.ConfirmPassword,
+		Name:            request.Name,
+		Lastname:        request.Lastname,
+		IdType:          int32(request.IdType),
+		IdNumber:        request.IdNumber,
+		Cellphone:       request.Cellphone,
+		BirthDate:       request.BirthDate,
+	})
+	if err != nil {
+		logger.Error.Printf("No se pudo crear el usuario, error: %s", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resCreateUser == nil {
+		logger.Error.Printf("No se pudo crear el usuario")
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resCreateUser.Error {
+		logger.Error.Printf(resCreateUser.Msg)
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Data = "Usuario creado correctamente, se envió un correo de confirmación a su correo electrónico"
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	res.Error = false
 	return c.Status(http.StatusOK).JSON(res)

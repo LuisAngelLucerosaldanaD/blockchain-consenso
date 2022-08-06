@@ -12,6 +12,7 @@ func RouterUser(app *fiber.App, db *sqlx.DB, txID string) {
 	v1 := api.Group("/v1")
 	user := v1.Group("/user")
 	user.Post("/login", h.Login)
+	user.Post("/create", h.CreateUser)
 	user.Post("/active", middleware.JWTProtected(), h.activateUser)
 	user.Post("/request-change-pwd", h.RequestChangePwd)
 	user.Post("/change-pwd", middleware.JWTProtected(), h.ChangePassword)

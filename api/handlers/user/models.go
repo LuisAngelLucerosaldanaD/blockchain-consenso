@@ -88,3 +88,16 @@ type ChangePwd struct {
 	NewPassword     string `json:"new_password"`
 	ConfirmPassword string `json:"confirm_password"`
 }
+
+type requestCreateUser struct {
+	Nickname        string `json:"nickname"`
+	Email           string `json:"email"`
+	Password        string `json:"password"`
+	ConfirmPassword string `json:"confirm_password"`
+	Name            string `json:"name"`
+	Lastname        string `json:"lastname"`
+	IdType          int    `json:"id_type"`
+	IdNumber        string `json:"id_number"`
+	Cellphone       string `json:"cellphone"`
+	BirthDate       string `json:"birth_date"`
+}
