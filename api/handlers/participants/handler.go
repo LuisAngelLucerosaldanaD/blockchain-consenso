@@ -85,17 +85,11 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 
 	if resWallet.Error {
 		logger.Error.Printf(resWallet.Msg)
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		res.Code, res.Type, res.Msg = msg.GetByCode(int(resWallet.Code), h.DB, h.TxID)
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	if len(resWallet.Data) <= 0 {
-		logger.Error.Printf("El usuario no tiene ninguna wallet registrada")
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	resAccount, err := clientAccount.GetAccountingByWalletById(ctx, &accounting_proto.RequestGetAccountingByWalletId{Id: resWallet.Data[0].Id})
+	resAccount, err := clientAccount.GetAccountingByWalletById(ctx, &accounting_proto.RequestGetAccountingByWalletId{Id: resWallet.Data.Id})
 	if err != nil {
 		logger.Error.Printf("error conectando con el servicio account de blockchain: %s", err)
 		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio account de blockchain"
@@ -114,13 +108,13 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	if float64(request.Amount) > resAccount.Data.Amount {
-		logger.Error.Printf("el dinero ingresado es mayor a la cantidad de acais que tiene actualmente")
-		res.Code, res.Type, res.Msg = 22, 1, "el dinero ingresado es mayor a la cantidad de acais que tiene actualmente"
+	if request.Amount > resAccount.Data.Amount {
+		logger.Error.Printf("la cantidad de acais ingresado es mayor a la cantidad de acais que tiene actualmente")
+		res.Code, res.Type, res.Msg = 22, 1, "la cantidad de acais ingresado es mayor a la cantidad de acais que tiene actualmente"
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	participant, code, err := srvBk.SrvParticipants.GetParticipantsByWalletID(resWallet.Data[0].Id)
+	participant, code, err := srvBk.SrvParticipants.GetParticipantsByWalletID(resWallet.Data.Id)
 	if err != nil {
 		logger.Error.Printf("couldn't get participant by wallet id, error: %s", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -135,7 +129,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 			return c.Status(http.StatusAccepted).JSON(res)
 		}
 
-		_, code, err = srvBk.SrvParticipants.CreateParticipants(uuid.New().String(), lotteryActive.ID, resWallet.Data[0].Id, request.Amount, false, 21, false)
+		_, code, err = srvBk.SrvParticipants.CreateParticipants(uuid.New().String(), lotteryActive.ID, resWallet.Data.Id, request.Amount, false, 21, false)
 		if err != nil {
 			logger.Error.Printf("couldn't get active lottery, error: %s", err)
 			res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -143,7 +137,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		}
 
 		resFrozen, err := clientWallet.FrozenMoney(ctx, &wallet_proto.RqFrozenMoney{
-			WalletId:  resWallet.Data[0].Id,
+			WalletId:  resWallet.Data.Id,
 			Amount:    request.Amount,
 			LotteryId: lotteryActive.ID,
 		})
@@ -190,7 +184,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	_, code, err = srvBk.SrvParticipants.CreateParticipants(uuid.New().String(), lotteryActive.ID, resWallet.Data[0].Id, request.Amount, false, 21, false)
+	_, code, err = srvBk.SrvParticipants.CreateParticipants(uuid.New().String(), lotteryActive.ID, resWallet.Data.Id, request.Amount, false, 21, false)
 	if err != nil {
 		logger.Error.Printf("couldn't get active lottery, error: %s", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
@@ -198,7 +192,7 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	}
 
 	resFrozen, err := clientWallet.FrozenMoney(ctx, &wallet_proto.RqFrozenMoney{
-		WalletId:  resWallet.Data[0].Id,
+		WalletId:  resWallet.Data.Id,
 		Amount:    request.Amount,
 		LotteryId: lotteryActive.ID,
 	})

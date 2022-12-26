@@ -9,6 +9,7 @@ import (
 	"bjungle-consenso/internal/helpers"
 	"bjungle-consenso/internal/logger"
 	"bjungle-consenso/internal/msg"
+	"bjungle-consenso/pkg/bc"
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
@@ -79,7 +80,7 @@ func (h *handlerUser) GetWalletsByUserId(c *fiber.Ctx) error {
 
 	res := resGetWallets{Error: true}
 	e := env.NewConfiguration()
-
+	srvBk := bc.NewServerBk(h.DB, nil, h.TxID)
 	u, err := helpers.GetUserContextV2(c)
 	if err != nil {
 		logger.Error.Printf("couldn't get user token: %v", err)
@@ -119,24 +120,30 @@ func (h *handlerUser) GetWalletsByUserId(c *fiber.Ctx) error {
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	if len(resWallet.Data) <= 0 {
+	if resWallet.Data == nil {
 		logger.Error.Printf("El usuario no tiene ninguna wallet asociada")
 		res.Code, res.Type, res.Msg = 22, 1, "El usuario no tiene ninguna wallet asociada"
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	var wallets []*Wallet
-	for _, wallet := range resWallet.Data {
-		wallets = append(wallets, &Wallet{
-			Id:             wallet.Id,
-			Mnemonic:       wallet.Mnemonic,
-			IpDevice:       wallet.IpDevice,
-			StatusId:       wallet.StatusId,
-			IdentityNumber: wallet.IdentityNumber,
-		})
+	resPenalty, err := srvBk.SrvPenalty.GetAllPenaltyParticipantsByWalletID(resWallet.Data.Id)
+	if err != nil {
+		logger.Error.Printf("error trayendo la cantidad de faltas, error: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	res.Data = wallets
+	res.Data = Wallet{
+		Id:             resWallet.Data.Id,
+		Mnemonic:       resWallet.Data.Mnemonic,
+		RsaPublic:      resWallet.Data.Public,
+		IpDevice:       resWallet.Data.IpDevice,
+		StatusId:       resWallet.Data.StatusId,
+		IdentityNumber: resWallet.Data.IdentityNumber,
+		Faults:         len(resPenalty),
+		CreatedAt:      resWallet.Data.CreatedAt,
+		UpdatedAt:      resWallet.Data.UpdatedAt,
+	}
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	res.Error = false
 	return c.Status(http.StatusOK).JSON(res)
@@ -160,29 +167,29 @@ func (h *handlerUser) GetAccountByWalletID(c *fiber.Ctx) error {
 	token := c.Get("Authorization")[7:]
 	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", token)
 
-	resAccount, err := clientAccount.GetAccountingByWalletById(ctx, &accounting_proto.RequestGetAccountingByWalletId{Id: walletId})
+	resWsAccount, err := clientAccount.GetAccountingByWalletById(ctx, &accounting_proto.RequestGetAccountingByWalletId{Id: walletId})
 	if err != nil {
 		logger.Error.Printf("error conectando con el servicio account de blockchain: %s", err)
 		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio account de blockchain"
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	if resAccount == nil {
+	if resWsAccount == nil {
 		logger.Error.Printf("error conectando con el servicio account de blockchain")
 		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio account de blockchain"
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
-	if resAccount.Error {
-		logger.Error.Printf(resAccount.Msg)
-		res.Code, res.Type, res.Msg = int(resAccount.Code), int(resAccount.Type), resAccount.Msg
+	if resWsAccount.Error {
+		logger.Error.Printf(resWsAccount.Msg)
+		res.Code, res.Type, res.Msg = int(resWsAccount.Code), int(resWsAccount.Type), resWsAccount.Msg
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
 	res.Data = Accounting{
-		Id:       resAccount.Data.Id,
-		IdWallet: resAccount.Data.IdWallet,
-		Amount:   resAccount.Data.Amount,
+		Id:       resWsAccount.Data.Id,
+		IdWallet: resWsAccount.Data.IdWallet,
+		Amount:   resWsAccount.Data.Amount,
 	}
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	res.Error = false

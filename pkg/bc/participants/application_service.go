@@ -9,8 +9,8 @@ import (
 )
 
 type PortsServerParticipants interface {
-	CreateParticipants(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) (*Participants, int, error)
-	UpdateParticipants(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) (*Participants, int, error)
+	CreateParticipants(id string, lotteryId string, walletId string, amount float64, accepted bool, typeCharge int, returned bool) (*Participants, int, error)
+	UpdateParticipants(id string, lotteryId string, walletId string, amount float64, accepted bool, typeCharge int, returned bool) (*Participants, int, error)
 	DeleteParticipants(id string) (int, error)
 	GetParticipantsByID(id string) (*Participants, int, error)
 	GetAllParticipants() ([]*Participants, error)
@@ -29,7 +29,7 @@ func NewParticipantsService(repository ServicesParticipantsRepository, user *mod
 	return &service{repository: repository, user: user, txID: TxID}
 }
 
-func (s *service) CreateParticipants(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) (*Participants, int, error) {
+func (s *service) CreateParticipants(id string, lotteryId string, walletId string, amount float64, accepted bool, typeCharge int, returned bool) (*Participants, int, error) {
 	m := NewParticipants(id, lotteryId, walletId, amount, accepted, typeCharge, returned)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)
@@ -46,7 +46,7 @@ func (s *service) CreateParticipants(id string, lotteryId string, walletId strin
 	return m, 29, nil
 }
 
-func (s *service) UpdateParticipants(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) (*Participants, int, error) {
+func (s *service) UpdateParticipants(id string, lotteryId string, walletId string, amount float64, accepted bool, typeCharge int, returned bool) (*Participants, int, error) {
 	m := NewParticipants(id, lotteryId, walletId, amount, accepted, typeCharge, returned)
 	if valid, err := m.valid(); !valid {
 		logger.Error.Println(s.txID, " - don't meet validations:", err)

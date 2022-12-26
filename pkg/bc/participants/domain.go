@@ -11,7 +11,7 @@ type Participants struct {
 	ID         string    `json:"id" db:"id" valid:"required,uuid"`
 	LotteryId  string    `json:"lottery_id" db:"lottery_id" valid:"required"`
 	WalletId   string    `json:"wallet_id" db:"wallet_id" valid:"required"`
-	Amount     int64     `json:"amount" db:"amount" valid:"required"`
+	Amount     float64   `json:"amount" db:"amount" valid:"required"`
 	Accepted   bool      `json:"accepted" db:"accepted" valid:"-"`
 	TypeCharge int       `json:"type_charge" db:"type_charge" valid:"required"`
 	Returned   bool      `json:"returned" db:"returned" valid:"-"`
@@ -19,7 +19,7 @@ type Participants struct {
 	UpdatedAt  time.Time `json:"updated_at" db:"updated_at"`
 }
 
-func NewParticipants(id string, lotteryId string, walletId string, amount int64, accepted bool, typeCharge int, returned bool) *Participants {
+func NewParticipants(id string, lotteryId string, walletId string, amount float64, accepted bool, typeCharge int, returned bool) *Participants {
 	return &Participants{
 		ID:         id,
 		LotteryId:  lotteryId,

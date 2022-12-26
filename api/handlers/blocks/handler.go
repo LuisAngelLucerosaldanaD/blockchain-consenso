@@ -5,6 +5,7 @@ import (
 	"bjungle-consenso/internal/grpc/blocks_proto"
 	"bjungle-consenso/internal/logger"
 	"bjungle-consenso/internal/msg"
+	"bjungle-consenso/pkg/bc"
 	"context"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
@@ -87,5 +88,42 @@ func (h *handlerBlocks) GetAllBlocks(c *fiber.Ctx) error {
 	res.Data = blocks
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
+
+func (h *handlerBlocks) GetCurrentLottery(c *fiber.Ctx) error {
+
+	res := resCurrentLottery{Error: true}
+	srv := bc.NewServerBk(h.DB, nil, h.TxID)
+	lotteryActive, code, err := srv.SrvLottery.GetLotteryActive()
+	if err != nil {
+		logger.Error.Printf("error al traer la loteria activa: %s", err.Error())
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if lotteryActive != nil {
+		res.Error = false
+		res.Data = Lottery(*lotteryActive)
+		res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	lotteryMined, code, err := srv.SrvLottery.GetLotteryActiveForMined()
+	if err != nil {
+		logger.Error.Printf("error al traer la loteria activa: %s", err.Error())
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if lotteryMined == nil {
+		logger.Error.Printf("No hay una loteria lista para mineria")
+		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Error = false
+	res.Data = Lottery(*lotteryMined)
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	return c.Status(http.StatusOK).JSON(res)
 }

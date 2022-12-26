@@ -41,13 +41,13 @@ func (h *handlerValidators) RegisterVoteValidator(c *fiber.Ctx) error {
 	}
 
 	if participant == nil {
-		logger.Error.Printf("Usted no esta registrado como participante para esta loteria")
-		res.Code, res.Type, res.Msg = 22, 1, "Usted no esta registrado como participante para esta loteria"
+		logger.Error.Printf("Usted no esta registrado como participante para esta lotería")
+		res.Code, res.Type, res.Msg = 22, 1, "Usted no esta registrado como participante para esta lotería"
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
 	if !participant.Accepted {
-		logger.Error.Printf("Usted no ha sido selecionado para como participante de esta loteria")
+		logger.Error.Printf("Usted no ha sido seleccionado para como participante de esta lotería")
 		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
@@ -66,12 +66,24 @@ func (h *handlerValidators) RegisterVoteValidator(c *fiber.Ctx) error {
 	}
 
 	if hashMined == nil {
-		logger.Error.Printf("El hash aun no ha sido resuelto por ningun minero")
-		res.Code, res.Type, res.Msg = 22, 1, "El hash aun no ha sido resuelto por ningun minero"
+		logger.Error.Printf("El hash aun no ha sido resuelto por ningún minero")
+		res.Code, res.Type, res.Msg = 22, 1, "El hash aun no ha sido resuelto por ningún minero"
 		return c.Status(http.StatusAccepted).JSON(res)
 	}
 
 	vote := hashMined.Hash == request.Hash
+
+	votePtr, _, err := srvBc.SrvValidatorsVote.GetValidatorVotesByParticipantID(participant.ID, hashMined.LotteryId)
+	if err != nil {
+		logger.Error.Printf("No se pudo validar el voto del participante, error: %V", err)
+		res.Code, res.Type, res.Msg = 22, 1, "No se pudo validar el voto del participante"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+	if votePtr != nil {
+		logger.Error.Printf("El participante ya ha registrado su voto para esta lotería")
+		res.Code, res.Type, res.Msg = 22, 1, "El participante ya ha registrado su voto para esta lotería"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
 
 	_, code, err = srvBc.SrvValidatorsVote.CreateValidatorVotes(uuid.New().String(), hashMined.LotteryId, participant.ID, request.Hash, vote)
 	if err != nil {

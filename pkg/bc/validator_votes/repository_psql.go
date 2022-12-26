@@ -112,3 +112,17 @@ func (s *psql) getByLotteryID(lotteryID string) ([]*ValidatorVotes, error) {
 	}
 	return ms, nil
 }
+
+// GetByID consulta un registro por su ID
+func (s *psql) getByParticipantID(participantId, lotteryID string) (*ValidatorVotes, error) {
+	const psqlGetByID = `SELECT id , lottery_id, participants_id, hash, vote, created_at, updated_at FROM bc.validator_votes WHERE participants_id = $1 and lottery_id = %2 limit 1 order by id desc `
+	mdl := ValidatorVotes{}
+	err := s.DB.Get(&mdl, psqlGetByID, participantId, lotteryID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return &mdl, err
+	}
+	return &mdl, nil
+}

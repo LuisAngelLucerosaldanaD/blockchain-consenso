@@ -9,7 +9,7 @@ type responseRegisterParticipant struct {
 }
 
 type requestRegisterParticipant struct {
-	Amount int64 `json:"amount"`
+	Amount float64 `json:"amount"`
 }
 
 type resParticipant struct {

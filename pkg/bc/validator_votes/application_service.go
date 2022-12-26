@@ -15,6 +15,7 @@ type PortsServerValidatorVotes interface {
 	GetValidatorVotesByID(id string) (*ValidatorVotes, int, error)
 	GetAllValidatorVotes() ([]*ValidatorVotes, error)
 	GetAllValidatorVotesByLotteryID(lotteryID string) ([]*ValidatorVotes, error)
+	GetValidatorVotesByParticipantID(participantID, lotteryID string) (*ValidatorVotes, int, error)
 }
 
 type service struct {
@@ -92,4 +93,13 @@ func (s *service) GetAllValidatorVotes() ([]*ValidatorVotes, error) {
 
 func (s *service) GetAllValidatorVotesByLotteryID(lotteryID string) ([]*ValidatorVotes, error) {
 	return s.repository.getByLotteryID(lotteryID)
+}
+
+func (s *service) GetValidatorVotesByParticipantID(participantID, lotteryID string) (*ValidatorVotes, int, error) {
+	m, err := s.repository.getByParticipantID(participantID, lotteryID)
+	if err != nil {
+		logger.Error.Println(s.txID, " - couldn`t getByParticipantID row:", err)
+		return nil, 22, err
+	}
+	return m, 29, nil
 }

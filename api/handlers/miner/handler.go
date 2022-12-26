@@ -122,9 +122,10 @@ func (h *handlerMiner) GetBlockToMine(c *fiber.Ctx) error {
 	block := resBkMine.Data
 	res.Data = &DataBlockToMine{
 		ID:         block.Id,
+		Timestamp:  block.Timestamp,
 		PrevHash:   block.PrevHash,
 		Difficulty: int(block.Difficulty),
-		Cuota:      float64(e.App.MinimumFee),
+		Cuota:      e.App.MinimumFee,
 	}
 	res.Error = false
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)

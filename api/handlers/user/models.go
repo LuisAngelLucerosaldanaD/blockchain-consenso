@@ -20,25 +20,23 @@ type Token struct {
 }
 
 type resGetWallets struct {
-	Error bool      `json:"error"`
-	Data  []*Wallet `json:"data"`
-	Code  int       `json:"code"`
-	Type  int       `json:"type"`
-	Msg   string    `json:"msg"`
+	Error bool   `json:"error"`
+	Data  Wallet `json:"data"`
+	Code  int    `json:"code"`
+	Type  int    `json:"type"`
+	Msg   string `json:"msg"`
 }
 
 type Wallet struct {
-	Id               string `json:"id,omitempty"`
-	Mnemonic         string `json:"mnemonic,omitempty"`
-	RsaPublic        string `json:"rsa_public,omitempty"`
-	RsaPrivate       string `json:"rsa_private,omitempty"`
-	RsaPublicDevice  string `json:"rsa_public_device,omitempty"`
-	RsaPrivateDevice string `json:"rsa_private_device,omitempty"`
-	IpDevice         string `json:"ip_device,omitempty"`
-	StatusId         int32  `json:"status_id,omitempty"`
-	IdentityNumber   string `json:"identity_number,omitempty"`
-	CreatedAt        string `json:"created_at,omitempty"`
-	UpdatedAt        string `json:"updated_at,omitempty"`
+	Id             string `json:"id,omitempty"`
+	Mnemonic       string `json:"mnemonic,omitempty"`
+	RsaPublic      string `json:"rsa_public,omitempty"`
+	IpDevice       string `json:"ip_device,omitempty"`
+	StatusId       int32  `json:"status_id,omitempty"`
+	IdentityNumber string `json:"identity_number,omitempty"`
+	Faults         int    `json:"faults"`
+	CreatedAt      string `json:"created_at,omitempty"`
+	UpdatedAt      string `json:"updated_at,omitempty"`
 }
 
 type resAccount struct {
@@ -59,11 +57,11 @@ type Accounting struct {
 }
 
 type resFreezeMoney struct {
-	Error bool   `json:"error"`
-	Data  int64  `json:"data"`
-	Code  int    `json:"code"`
-	Type  int    `json:"type"`
-	Msg   string `json:"msg"`
+	Error bool    `json:"error"`
+	Data  float64 `json:"data"`
+	Code  int     `json:"code"`
+	Type  int     `json:"type"`
+	Msg   string  `json:"msg"`
 }
 
 type responseAnny struct {

@@ -21,20 +21,20 @@ type configuration struct {
 }
 
 type App struct {
-	ServiceName       string `json:"service_name"`
-	Port              int    `json:"port"`
-	AllowedDomains    string `json:"allowed_domains"`
-	PathLog           string `json:"path_log"`
-	LogReviewInterval int    `json:"log_review_interval"`
-	RegisterLog       bool   `json:"register_log"`
-	RSAPrivateKey     string `json:"rsa_private_key"`
-	RSAPublicKey      string `json:"rsa_public_key"`
-	LoggerHttp        bool   `json:"logger_http"`
-	Difficulty        int    `json:"difficulty"`
-	Language          string `json:"language"`
-	UserLogin         string `json:"user_login"`
-	UserPassword      string `json:"user_password"`
-	MinimumFee        int64  `json:"minimum_fee"`
+	ServiceName       string  `json:"service_name"`
+	Port              int     `json:"port"`
+	AllowedDomains    string  `json:"allowed_domains"`
+	PathLog           string  `json:"path_log"`
+	LogReviewInterval int     `json:"log_review_interval"`
+	RegisterLog       bool    `json:"register_log"`
+	RSAPrivateKey     string  `json:"rsa_private_key"`
+	RSAPublicKey      string  `json:"rsa_public_key"`
+	LoggerHttp        bool    `json:"logger_http"`
+	Difficulty        int     `json:"difficulty"`
+	Language          string  `json:"language"`
+	UserLogin         string  `json:"user_login"`
+	UserPassword      string  `json:"user_password"`
+	MinimumFee        float64 `json:"minimum_fee"`
 }
 
 type DB struct {

@@ -2,7 +2,6 @@ package miner
 
 import (
 	"bjungle-consenso/pkg/bc/miner_response"
-	"time"
 )
 
 type rqRegisterMined struct {
@@ -29,12 +28,12 @@ type responseGetBlock struct {
 }
 
 type DataBlockToMine struct {
-	ID         int64     `json:"id"`
-	Data       []byte    `json:"data"`
-	Timestamp  time.Time `json:"timestamp"`
-	PrevHash   []byte    `json:"prev_hash"`
-	Difficulty int       `json:"difficulty"`
-	Cuota      float64   `json:"cuota"`
+	ID         int64   `json:"id"`
+	Data       []byte  `json:"data"`
+	Timestamp  string  `json:"timestamp"`
+	PrevHash   []byte  `json:"prev_hash"`
+	Difficulty int     `json:"difficulty"`
+	Cuota      float64 `json:"cuota"`
 }
 
 type responseHashMined struct {

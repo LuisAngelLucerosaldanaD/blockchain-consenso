@@ -5,6 +5,7 @@ import (
 	"bjungle-consenso/pkg/bc/lotteries"
 	"bjungle-consenso/pkg/bc/miner_response"
 	"bjungle-consenso/pkg/bc/participants"
+	"bjungle-consenso/pkg/bc/penalty_participants"
 	"bjungle-consenso/pkg/bc/rewards"
 	"bjungle-consenso/pkg/bc/validator_votes"
 	"github.com/jmoiron/sqlx"
@@ -13,6 +14,7 @@ import (
 type Server struct {
 	SrvLottery        lotteries.PortsServerLottery
 	SrvParticipants   participants.PortsServerParticipants
+	SrvPenalty        penalty_participants.PortsServerPenaltyParticipants
 	SrvReward         rewards.PortsServerRewards
 	SrvValidatorsVote validator_votes.PortsServerValidatorVotes
 	SrvMinerResponse  miner_response.PortsServerMinerResponse
@@ -35,11 +37,15 @@ func NewServerBk(db *sqlx.DB, user *models.User, txID string) *Server {
 	repoMinerResponse := miner_response.FactoryStorage(db, user, txID)
 	srvMinerResponse := miner_response.NewMinerResponseService(repoMinerResponse, user, txID)
 
+	repoPenalty := penalty_participants.FactoryStorage(db, user, txID)
+	srvPenalty := penalty_participants.NewPenaltyParticipantsService(repoPenalty, user, txID)
+
 	return &Server{
 		SrvLottery:        srvLottery,
 		SrvParticipants:   srvParticipants,
 		SrvReward:         srvReward,
 		SrvValidatorsVote: srvValidatorsVote,
 		SrvMinerResponse:  srvMinerResponse,
+		SrvPenalty:        srvPenalty,
 	}
 }
