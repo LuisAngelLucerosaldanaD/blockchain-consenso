@@ -72,8 +72,35 @@ type responseAnny struct {
 	Msg   string `json:"msg"`
 }
 
+type responseActivateWallet struct {
+	Error bool   `json:"error"`
+	Data  *Key   `json:"data"`
+	Code  int    `json:"code"`
+	Type  int    `json:"type"`
+	Msg   string `json:"msg"`
+}
+
+type Key struct {
+	Public   string `json:"public"`
+	Private  string `json:"private"`
+	Mnemonic string `json:"mnemonic"`
+}
+
+type responseCreateWallet struct {
+	Error bool                  `json:"error"`
+	Data  requestActivateWallet `json:"data"`
+	Code  int                   `json:"code"`
+	Type  int                   `json:"type"`
+	Msg   string                `json:"msg"`
+}
+
 type requestActivateUser struct {
 	Code string `json:"code"`
+}
+
+type requestActivateWallet struct {
+	Id       string `json:"id"`
+	Mnemonic string `json:"mnemonic"`
 }
 
 type ReqChangePwd struct {

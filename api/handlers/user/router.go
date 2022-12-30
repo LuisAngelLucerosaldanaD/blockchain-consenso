@@ -14,6 +14,8 @@ func RouterUser(app *fiber.App, db *sqlx.DB, txID string) {
 	user.Post("/login", h.Login)
 	user.Post("/create", h.CreateUser)
 	user.Post("/active", middleware.JWTProtected(), h.activateUser)
+	user.Post("/create-wallet", middleware.JWTProtected(), h.createWallet)
+	user.Post("/active-wallet", middleware.JWTProtected(), h.activateWallet)
 	user.Post("/request-change-pwd", h.RequestChangePwd)
 	user.Post("/change-pwd", middleware.JWTProtected(), h.ChangePassword)
 	user.Get("/wallets", middleware.JWTProtected(), h.GetWalletsByUserId)

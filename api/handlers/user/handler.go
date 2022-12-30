@@ -362,6 +362,112 @@ func (h *handlerUser) activateUser(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+func (h *handlerUser) activateWallet(c *fiber.Ctx) error {
+	e := env.NewConfiguration()
+	res := responseActivateWallet{Error: true}
+
+	m := requestActivateWallet{}
+	err := c.BodyParser(&m)
+	if err != nil {
+		logger.Error.Printf("couldn't bind model create wallets: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+	defer connAuth.Close()
+
+	clientWallet := wallet_proto.NewWalletServicesWalletClient(connAuth)
+
+	token := c.Get("Authorization")[7:]
+	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", token)
+
+	resActivate, err := clientWallet.ActivateWallet(ctx, &wallet_proto.RequestActivateWallet{Id: m.Id, Mnemonic: m.Mnemonic})
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resActivate == nil {
+		logger.Error.Printf("No se pudo activar la cuenta del usuario: %v", err)
+		res.Code, res.Type, res.Msg = 22, 1, "No se pudo activar la cuenta del usuario"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resActivate.Error {
+		logger.Error.Printf(resActivate.Msg)
+		res.Code, res.Type, res.Msg = int(resActivate.Code), int(resActivate.Type), resActivate.Msg
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Data = &Key{
+		Public:   resActivate.Data.Key.Public,
+		Private:  resActivate.Data.Key.Private,
+		Mnemonic: resActivate.Data.Mnemonic,
+	}
+	res.Code, res.Type, res.Msg = 29, 29, "Su wallet se activo correctamente"
+	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
+
+func (h *handlerUser) createWallet(c *fiber.Ctx) error {
+	e := env.NewConfiguration()
+	res := responseCreateWallet{Error: true}
+
+	usr, err := helpers.GetUserContextV2(c)
+	if err != nil {
+		logger.Error.Printf("No se pudo obtener el usuario de la sesión: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "No se pudo obtener el usuario de la sesión"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+	defer connAuth.Close()
+
+	clientWallet := wallet_proto.NewWalletServicesWalletClient(connAuth)
+
+	token := c.Get("Authorization")[7:]
+	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", token)
+
+	resCreateWt, err := clientWallet.CreateWallet(ctx, &wallet_proto.RequestCreateWallet{UserId: usr.ID})
+	if err != nil {
+		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
+		res.Code, res.Type, res.Msg = 22, 1, "error conectando con el servicio auth de blockchain"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resCreateWt == nil {
+		logger.Error.Printf("No se pudo crear la wallet: %v", err)
+		res.Code, res.Type, res.Msg = 22, 1, "No se pudo crear la wallet"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if resCreateWt.Error {
+		logger.Error.Printf(resCreateWt.Msg)
+		res.Code, res.Type, res.Msg = int(resCreateWt.Code), int(resCreateWt.Type), resCreateWt.Msg
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Data = requestActivateWallet{
+		Id:       resCreateWt.Data.Id,
+		Mnemonic: resCreateWt.Data.Mnemonic,
+	}
+	res.Code, res.Type, res.Msg = 29, 29, "Se ha creado la wallet, se ha enviado un correo electrónico a su correo para activar la cuenta"
+	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}
+
 func (h *handlerUser) RequestChangePwd(c *fiber.Ctx) error {
 	res := responseAnny{Error: true}
 	e := env.NewConfiguration()
