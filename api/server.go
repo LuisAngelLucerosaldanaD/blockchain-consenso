@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	version     = "0.0.1"
+	version     = "0.1.2"
 	website     = "https://www.bjungle.net"
 	banner      = `BLion api consenso`
 	description = `BLion api consenso - %s - Port: %s
