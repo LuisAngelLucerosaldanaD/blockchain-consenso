@@ -2,7 +2,7 @@ package blocks
 
 import "time"
 
-type resAllBlocks struct {
+type ResAllBlocks struct {
 	Error bool     `json:"error"`
 	Data  []*Block `json:"data"`
 	Code  int      `json:"code"`

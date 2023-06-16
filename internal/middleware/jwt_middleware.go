@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"crypto/rsa"
-	"fmt"
 	"io/ioutil"
 
 	"bjungle-consenso/internal/models"
@@ -64,43 +63,4 @@ func jwtError(c *fiber.Ctx, err error) error {
 	}
 	return c.Status(fiber.StatusUnauthorized).
 		JSON(fiber.Map{"status": "error", "message": "Invalid or expired JWT", "data": nil})
-}
-
-func GetUser(c *fiber.Ctx) (*models.User, error) {
-	bearer := c.Get("Authorization")
-	tkn := bearer[7:]
-
-	var u *models.User
-	verifyFunction := func(tkn *jwt.Token) (interface{}, error) {
-		return verifyKey, nil
-	}
-
-	token, err := jwt.ParseWithClaims(tkn, &jwtCustomClaims{}, verifyFunction)
-	if err != nil {
-		switch err.(type) {
-		case *jwt.ValidationError:
-			vErr := err.(*jwt.ValidationError)
-			switch vErr.Errors {
-			case jwt.ValidationErrorExpired:
-				logger.Warning.Printf("token expirado: %v", err)
-				return u, err
-			default:
-				logger.Warning.Printf("Error de validacion del token: %v", err)
-				return u, err
-			}
-		default:
-			logger.Warning.Printf("Error al procesar el token: %v", err)
-			return u, err
-		}
-	}
-	u = token.Claims.(*jwtCustomClaims).User
-	if !token.Valid {
-		logger.Warning.Printf("Token no Valido: %v", err)
-		return u, fmt.Errorf("Token no Valido")
-	}
-	if c.IP() != u.RealIP {
-		logger.Warning.Printf("Token creado en un origen diferente : %v", err)
-		return u, fmt.Errorf("Token creado en un origen diferente")
-	}
-	return u, nil
 }

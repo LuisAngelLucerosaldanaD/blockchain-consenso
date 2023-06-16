@@ -15,6 +15,16 @@ type handlerValidators struct {
 	TxID string
 }
 
+// RegisterVoteValidator godoc
+// @Summary Método para registrar el voto de un validador
+// @Description Método para registrar el voto de un validador
+// @tags Validator
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param rqRegisterVote body rqRegisterVote true "Datos para registrar el voto"
+// @Success 200 {object} resRegisterVote
+// @Router /api/v1/validators/register [post]
 func (h *handlerValidators) RegisterVoteValidator(c *fiber.Ctx) error {
 	res := resRegisterVote{Error: true}
 	request := rqRegisterVote{}

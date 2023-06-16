@@ -21,8 +21,18 @@ type handlerBlocks struct {
 	TxID string
 }
 
+// GetAllBlocks godoc
+// @Summary Método para obtener todos los bloques de la Blockchain
+// @Description Método para obtener todos los bloques de la Blockchain de BLion
+// @tags Block
+// @Accept json
+// @Produce json
+// @Param limit path string true "Número de bloques por petición"
+// @Param offset path string true "Salto de bloques por petición"
+// @Success 200 {object} ResAllBlocks
+// @Router /api/v1/block/get-all/{limit}/{offset} [get]
 func (h *handlerBlocks) GetAllBlocks(c *fiber.Ctx) error {
-	res := resAllBlocks{Error: true}
+	res := ResAllBlocks{Error: true}
 	e := env.NewConfiguration()
 
 	limitStr := c.Params("limit")
@@ -91,6 +101,14 @@ func (h *handlerBlocks) GetAllBlocks(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetCurrentLottery godoc
+// @Summary Método para obtener la lotería actual
+// @Description Método para obtener la lotería actual
+// @tags Block
+// @Accept json
+// @Produce json
+// @Success 200 {object} resCurrentLottery
+// @Router /api/v1/block/current-lottery [get]
 func (h *handlerBlocks) GetCurrentLottery(c *fiber.Ctx) error {
 
 	res := resCurrentLottery{Error: true}

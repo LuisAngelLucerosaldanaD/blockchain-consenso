@@ -16,20 +16,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// @title OnlyOne Smart Contract.
-// @version 1.0
-// @description Documentation Smart Contract.
-// @termsOfService https://www.bjungle.net/terms/
-// @contact.name API Support.
-// @contact.email info@bjungle.net
-// @license.name Software Owner
-// @license.url https://www.bjungle.net/terms/licenses
-// @host localhost:50025
-// @BasePath /
 func routes(db *sqlx.DB, loggerHttp bool, allowedOrigins string) *fiber.App {
 	app := fiber.New()
 
-	prometheus := fiberprometheus.New("OnlyOne Smart Contract")
+	prometheus := fiberprometheus.New("BLion Consenso")
 	prometheus.RegisterAt(app, "/metrics")
 
 	app.Get("/swagger/*", swagger.New(swagger.Config{

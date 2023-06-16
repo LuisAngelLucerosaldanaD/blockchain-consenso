@@ -24,6 +24,16 @@ type handlerParticipant struct {
 	TxID string
 }
 
+// RegisterParticipant godoc
+// @Summary Método para registrar un participante en la lotería actual
+// @Description Método para registrar un participante en la lotería actual
+// @tags Participants
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param requestRegisterParticipant body requestRegisterParticipant true "Datos para registrarse en la lotería"
+// @Success 200 {object} responseRegisterParticipant
+// @Router /api/v1/participants/register [post]
 func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := responseRegisterParticipant{Error: true}
@@ -220,6 +230,16 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetInfoParticipant godoc
+// @Summary Método para obtener la información de un participante
+// @Description Método para obtener la información de un participante por su wallet id
+// @tags Participants
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param wallet path string true "Id de la wallet"
+// @Success 200 {object} resParticipant
+// @Router /api/v1/participants/info/{wallet} [get]
 func (h *handlerParticipant) GetInfoParticipant(c *fiber.Ctx) error {
 	res := resParticipant{Error: true}
 	srvBk := bc.NewServerBk(h.DB, nil, h.TxID)

@@ -1,0 +1,900 @@
+basePath: /
+definitions:
+  blocks.Block:
+    properties:
+      created_at:
+        type: string
+      data:
+        type: string
+      difficulty:
+        type: integer
+      hash:
+        type: string
+      id:
+        type: integer
+      id_user:
+        type: string
+      last_validation_date:
+        type: string
+      mined_at:
+        type: string
+      mined_by:
+        type: string
+      nonce:
+        type: integer
+      prev_hash:
+        type: string
+      status_id:
+        type: integer
+      timestamp:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  blocks.Lottery:
+    properties:
+      block_id:
+        type: integer
+      created_at:
+        type: string
+      id:
+        type: string
+      lottery_end_date:
+        type: string
+      lottery_start_date:
+        type: string
+      process_end_date:
+        type: string
+      process_status:
+        type: integer
+      registration_end_date:
+        type: string
+      registration_start_date:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  blocks.ResAllBlocks:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/blocks.Block'
+        type: array
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  blocks.resCurrentLottery:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/blocks.Lottery'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  miner.DataBlockToMine:
+    properties:
+      cuota:
+        type: number
+      data:
+        items:
+          type: integer
+        type: array
+      difficulty:
+        type: integer
+      id:
+        type: integer
+      prev_hash:
+        items:
+          type: integer
+        type: array
+      timestamp:
+        type: string
+    type: object
+  miner.responseGetBlock:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/miner.DataBlockToMine'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  miner.responseHashMined:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/miner_response.MinerResponse'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  miner.responseRegisterMined:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  miner.rqRegisterMined:
+    properties:
+      difficulty:
+        type: integer
+      hash:
+        type: string
+      nonce:
+        type: integer
+      wallet_id:
+        type: string
+    type: object
+  miner_response.MinerResponse:
+    properties:
+      created_at:
+        type: string
+      difficulty:
+        type: integer
+      hash:
+        type: string
+      id:
+        type: string
+      lottery_id:
+        type: string
+      nonce:
+        type: integer
+      participants_id:
+        type: string
+      status:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  participants.InfoParticipant:
+    properties:
+      accepted:
+        type: boolean
+      charge:
+        type: integer
+    type: object
+  participants.requestRegisterParticipant:
+    properties:
+      amount:
+        type: number
+    type: object
+  participants.resParticipant:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/participants.InfoParticipant'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  participants.responseRegisterParticipant:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.Accounting:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: string
+      id_user:
+        type: string
+      id_wallet:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  user.ChangePwd:
+    properties:
+      confirm_password:
+        type: string
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  user.Key:
+    properties:
+      mnemonic:
+        type: string
+      private:
+        type: string
+      public:
+        type: string
+    type: object
+  user.ReqChangePwd:
+    properties:
+      email:
+        type: string
+      nickname:
+        type: string
+    type: object
+  user.Token:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  user.Wallet:
+    properties:
+      created_at:
+        type: string
+      faults:
+        type: integer
+      id:
+        type: string
+      identity_number:
+        type: string
+      ip_device:
+        type: string
+      mnemonic:
+        type: string
+      rsa_public:
+        type: string
+      status_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  user.requestActivateUser:
+    properties:
+      code:
+        type: string
+    type: object
+  user.requestActivateWallet:
+    properties:
+      id:
+        type: string
+      mnemonic:
+        type: string
+    type: object
+  user.requestCreateUser:
+    properties:
+      birth_date:
+        type: string
+      cellphone:
+        type: string
+      confirm_password:
+        type: string
+      email:
+        type: string
+      id_number:
+        type: string
+      id_type:
+        type: integer
+      lastname:
+        type: string
+      name:
+        type: string
+      nickname:
+        type: string
+      password:
+        type: string
+    type: object
+  user.resAccount:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/user.Accounting'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.resFreezeMoney:
+    properties:
+      code:
+        type: integer
+      data:
+        type: number
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.resGetWallets:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/user.Wallet'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.responseActivateWallet:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/user.Key'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.responseAnny:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.responseCreateWallet:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/user.requestActivateWallet'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.responseLogin:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/user.Token'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  user.rqLogin:
+    properties:
+      email:
+        type: string
+      nick_name:
+        type: string
+      password:
+        type: string
+    type: object
+  validator.resRegisterVote:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  validator.rqRegisterVote:
+    properties:
+      hash:
+        type: string
+      wallet_id:
+        type: string
+    type: object
+host: http://172.174.77.149:2054
+info:
+  contact:
+    email: info@bjungle.net
+    name: API Support
+  description: Documentación del API que conecta con el core de BLion
+  license:
+    name: Software Owner
+    url: https://www.bjungle.net/terms/licenses
+  termsOfService: https://www.bjungle.net/terms/
+  title: BLion
+  version: "1.1"
+paths:
+  /api/v1/block/current-lottery:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener la lotería actual
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blocks.resCurrentLottery'
+      summary: Método para obtener la lotería actual
+      tags:
+      - Block
+  /api/v1/block/get-all/{limit}/{offset}:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener todos los bloques de la Blockchain de BLion
+      parameters:
+      - description: Número de bloques por petición
+        in: path
+        name: limit
+        required: true
+        type: string
+      - description: Salto de bloques por petición
+        in: path
+        name: offset
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/blocks.ResAllBlocks'
+      summary: Método para obtener todos los bloques de la Blockchain
+      tags:
+      - Block
+  /api/v1/miner/block-to-mine:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener el bloque a minar
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/miner.responseGetBlock'
+      summary: Método para obtener el bloque a minar
+      tags:
+      - Miner
+  /api/v1/miner/hash-mined:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener el hash del bloque minado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/miner.responseHashMined'
+      summary: Método para obtener el hash del bloque minado
+      tags:
+      - Miner
+  /api/v1/miner/register-mined:
+    post:
+      consumes:
+      - application/json
+      description: Método para registrar el hash del bloque minado
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos del hash del bloque minado
+        in: body
+        name: rqRegisterMined
+        required: true
+        schema:
+          $ref: '#/definitions/miner.rqRegisterMined'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/miner.responseRegisterMined'
+      summary: Método para registrar el hash del bloque minado
+      tags:
+      - Miner
+  /api/v1/participants/info/{wallet}:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener la información de un participante por su wallet
+        id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id de la wallet
+        in: path
+        name: wallet
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/participants.resParticipant'
+      summary: Método para obtener la información de un participante
+      tags:
+      - Participants
+  /api/v1/participants/register:
+    post:
+      consumes:
+      - application/json
+      description: Método para registrar un participante en la lotería actual
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para registrarse en la lotería
+        in: body
+        name: requestRegisterParticipant
+        required: true
+        schema:
+          $ref: '#/definitions/participants.requestRegisterParticipant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/participants.responseRegisterParticipant'
+      summary: Método para registrar un participante en la lotería actual
+      tags:
+      - Participants
+  /api/v1/user/accounting/{wallet}:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener una cuenta asociada a una wallet
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id de la wallet
+        in: path
+        name: wallet
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.resAccount'
+      summary: Método para obtener una cuenta por wallet id
+      tags:
+      - User
+  /api/v1/user/active:
+    post:
+      consumes:
+      - application/json
+      description: Método para activar la cuenta de un usuario recién creado
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para activar la cuenta
+        in: body
+        name: requestActivateUser
+        required: true
+        schema:
+          $ref: '#/definitions/user.requestActivateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseAnny'
+      summary: Método para activar la cuenta
+      tags:
+      - User
+  /api/v1/user/active-wallet:
+    post:
+      consumes:
+      - application/json
+      description: Método para activar la wallet de un usuario recién creada
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para activar la wallet
+        in: body
+        name: requestActivateWallet
+        required: true
+        schema:
+          $ref: '#/definitions/user.requestActivateWallet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseActivateWallet'
+      summary: Método para activar la wallet
+      tags:
+      - User
+  /api/v1/user/change-pwd:
+    post:
+      consumes:
+      - application/json
+      description: Método para cambiar de contraseña
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para cambiar la contraseña
+        in: body
+        name: ChangePwd
+        required: true
+        schema:
+          $ref: '#/definitions/user.ChangePwd'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseAnny'
+      summary: Método para cambiar de contraseña
+      tags:
+      - User
+  /api/v1/user/create:
+    post:
+      consumes:
+      - application/json
+      description: Método para crear un usuario en BLion
+      parameters:
+      - description: Datos para la creación del usuario
+        in: body
+        name: requestCreateUser
+        required: true
+        schema:
+          $ref: '#/definitions/user.requestCreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseAnny'
+      summary: Método para crear un usuario en BLion
+      tags:
+      - User
+  /api/v1/user/create-wallet:
+    post:
+      consumes:
+      - application/json
+      description: Método para crea la wallet de un usuario
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseCreateWallet'
+      summary: Método para crear la wallet
+      tags:
+      - User
+  /api/v1/user/freeze-money/{wallet}:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener la cantidad de acais congelados
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Id de la wallet
+        in: path
+        name: wallet
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.resFreezeMoney'
+      summary: Método para obtener la cantidad de acais congelados
+      tags:
+      - User
+  /api/v1/user/login:
+    post:
+      consumes:
+      - application/json
+      description: Método para autenticarse en BLion
+      parameters:
+      - description: Datos de inicio de sesión
+        in: body
+        name: rqLogin
+        required: true
+        schema:
+          $ref: '#/definitions/user.rqLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseLogin'
+      summary: Método de autenticación
+      tags:
+      - User
+  /api/v1/user/request-change-pwd:
+    post:
+      consumes:
+      - application/json
+      description: Método para solicitar la recuperación de la cuenta
+      parameters:
+      - description: Datos para restablecer la cuenta
+        in: body
+        name: ReqChangePwd
+        required: true
+        schema:
+          $ref: '#/definitions/user.ReqChangePwd'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.responseAnny'
+      summary: Método para solicitar la recuperación de la cuenta
+      tags:
+      - User
+  /api/v1/user/wallets:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener una wallet por un user id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.resGetWallets'
+      summary: Método para obtener una wallet por un user id
+      tags:
+      - User
+  /api/v1/validators/register:
+    post:
+      consumes:
+      - application/json
+      description: Método para registrar el voto de un validador
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para registrar el voto
+        in: body
+        name: rqRegisterVote
+        required: true
+        schema:
+          $ref: '#/definitions/validator.rqRegisterVote'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/validator.resRegisterVote'
+      summary: Método para registrar el voto de un validador
+      tags:
+      - Validator
+swagger: "2.0"
+tags:
+- description: Métodos para la gestión de los bloques
+  name: Block
+- description: Métodos para la gestión de los mineros
+  name: Miner
+- description: Métodos para la gestión de las transacciones
+  name: Transacción
+- description: Métodos para la gestión de participantes en la lotería
+  name: Participants
+- description: Métodos para la gestión de usuarios
+  name: User
+- description: Métodos para la gestión de validadores
+  name: Validator

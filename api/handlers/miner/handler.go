@@ -21,6 +21,16 @@ type handlerMiner struct {
 	TxID string
 }
 
+// RegisterHashMined godoc
+// @Summary Método para registrar el hash del bloque minado
+// @Description Método para registrar el hash del bloque minado
+// @tags Miner
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param rqRegisterMined body rqRegisterMined true "Datos del hash del bloque minado"
+// @Success 200 {object} responseRegisterMined
+// @Router /api/v1/miner/register-mined [post]
 func (h *handlerMiner) RegisterHashMined(c *fiber.Ctx) error {
 	res := responseRegisterMined{Error: true}
 	request := rqRegisterMined{}
@@ -85,6 +95,15 @@ func (h *handlerMiner) RegisterHashMined(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetBlockToMine godoc
+// @Summary Método para obtener el bloque a minar
+// @Description Método para obtener el bloque a minar
+// @tags Miner
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Success 200 {object} responseGetBlock
+// @Router /api/v1/miner/block-to-mine [get]
 func (h *handlerMiner) GetBlockToMine(c *fiber.Ctx) error {
 	res := responseGetBlock{Error: true}
 	e := env.NewConfiguration()
@@ -132,6 +151,14 @@ func (h *handlerMiner) GetBlockToMine(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetHashMined godoc
+// @Summary Método para obtener el hash del bloque minado
+// @Description Método para obtener el hash del bloque minado
+// @tags Miner
+// @Accept json
+// @Produce json
+// @Success 200 {object} responseHashMined
+// @Router /api/v1/miner/hash-mined [get]
 func (h *handlerMiner) GetHashMined(c *fiber.Ctx) error {
 
 	res := responseHashMined{Error: true}

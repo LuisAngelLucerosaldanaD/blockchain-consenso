@@ -25,6 +25,15 @@ type handlerUser struct {
 	TxID string
 }
 
+// Login godoc
+// @Summary Método de autenticación
+// @Description Método para autenticarse en BLion
+// @tags User
+// @Accept json
+// @Produce json
+// @Param rqLogin body rqLogin true "Datos de inicio de sesión"
+// @Success 200 {object} responseLogin
+// @Router /api/v1/user/login [post]
 func (h *handlerUser) Login(c *fiber.Ctx) error {
 	res := responseLogin{Error: true}
 	request := rqLogin{}
@@ -76,6 +85,15 @@ func (h *handlerUser) Login(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetWalletsByUserId godoc
+// @Summary Método para obtener una wallet por un user id
+// @Description Método para obtener una wallet por un user id
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Success 200 {object} resGetWallets
+// @Router /api/v1/user/wallets [get]
 func (h *handlerUser) GetWalletsByUserId(c *fiber.Ctx) error {
 
 	res := resGetWallets{Error: true}
@@ -149,6 +167,16 @@ func (h *handlerUser) GetWalletsByUserId(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetAccountByWalletID godoc
+// @Summary Método para obtener una cuenta por wallet id
+// @Description Método para obtener una cuenta asociada a una wallet
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param wallet path string true "Id de la wallet"
+// @Success 200 {object} resAccount
+// @Router /api/v1/user/accounting/{wallet} [get]
 func (h *handlerUser) GetAccountByWalletID(c *fiber.Ctx) error {
 	res := resAccount{Error: true}
 	walletId := c.Params("wallet")
@@ -196,6 +224,16 @@ func (h *handlerUser) GetAccountByWalletID(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// GetFreezeMoney godoc
+// @Summary Método para obtener la cantidad de acais congelados
+// @Description Método para obtener la cantidad de acais congelados
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param wallet path string true "Id de la wallet"
+// @Success 200 {object} resFreezeMoney
+// @Router /api/v1/user/freeze-money/{wallet} [get]
 func (h *handlerUser) GetFreezeMoney(c *fiber.Ctx) error {
 
 	res := resFreezeMoney{Error: true}
@@ -240,6 +278,15 @@ func (h *handlerUser) GetFreezeMoney(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// CreateUser godoc
+// @Summary Método para crear un usuario en BLion
+// @Description Método para crear un usuario en BLion
+// @tags User
+// @Accept json
+// @Produce json
+// @Param requestCreateUser body requestCreateUser true "Datos para la creación del usuario"
+// @Success 200 {object} responseAnny
+// @Router /api/v1/user/create [post]
 func (h *handlerUser) CreateUser(c *fiber.Ctx) error {
 	res := responseAnny{Error: true}
 	request := requestCreateUser{}
@@ -303,15 +350,16 @@ func (h *handlerUser) CreateUser(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
-// active user godoc
-// @Summary BLion Api consenso
-// @Description Active User
-// @Accept  json
-// @Produce  json
+// activateUser godoc
+// @Summary Método para activar la cuenta
+// @Description Método para activar la cuenta de un usuario recién creado
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param requestActivateUser body requestActivateUser true "Datos para activar la cuenta"
 // @Success 200 {object} responseAnny
-// @Success 202 {object} requestActivateUser
 // @Router /api/v1/user/active [post]
-// @Authorization Bearer token
 func (h *handlerUser) activateUser(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := responseAnny{Error: true}
@@ -362,6 +410,16 @@ func (h *handlerUser) activateUser(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// activateWallet godoc
+// @Summary Método para activar la wallet
+// @Description Método para activar la wallet de un usuario recién creada
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param requestActivateWallet body requestActivateWallet true "Datos para activar la wallet"
+// @Success 200 {object} responseActivateWallet
+// @Router /api/v1/user/active-wallet [post]
 func (h *handlerUser) activateWallet(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := responseActivateWallet{Error: true}
@@ -416,6 +474,15 @@ func (h *handlerUser) activateWallet(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// createWallet godoc
+// @Summary Método para crear la wallet
+// @Description Método para crea la wallet de un usuario
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Success 200 {object} responseCreateWallet
+// @Router /api/v1/user/create-wallet [post]
 func (h *handlerUser) createWallet(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := responseCreateWallet{Error: true}
@@ -468,6 +535,15 @@ func (h *handlerUser) createWallet(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// RequestChangePwd godoc
+// @Summary Método para solicitar la recuperación de la cuenta
+// @Description Método para solicitar la recuperación de la cuenta
+// @tags User
+// @Accept json
+// @Produce json
+// @Param ReqChangePwd body ReqChangePwd true "Datos para restablecer la cuenta"
+// @Success 200 {object} responseAnny
+// @Router /api/v1/user/request-change-pwd [post]
 func (h *handlerUser) RequestChangePwd(c *fiber.Ctx) error {
 	res := responseAnny{Error: true}
 	e := env.NewConfiguration()
@@ -517,6 +593,16 @@ func (h *handlerUser) RequestChangePwd(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(res)
 }
 
+// ChangePassword godoc
+// @Summary Método para cambiar de contraseña
+// @Description Método para cambiar de contraseña
+// @tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Authorization" default(Bearer <Add access token here>)
+// @Param ChangePwd body ChangePwd true "Datos para cambiar la contraseña"
+// @Success 200 {object} responseAnny
+// @Router /api/v1/user/change-pwd [post]
 func (h *handlerUser) ChangePassword(c *fiber.Ctx) error {
 	res := responseAnny{Error: true}
 	e := env.NewConfiguration()
