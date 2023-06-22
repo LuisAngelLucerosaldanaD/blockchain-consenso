@@ -266,6 +266,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/transactions/all/{limit}/{offset}": {
+            "get": {
+                "description": "Método para obtener todas las transacciones de la blockchain",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transacción"
+                ],
+                "summary": "Método para obtener todas las transacciones de la blockchain",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Número de transacciones por petición",
+                        "name": "limit",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Salto de transacciones por petición",
+                        "name": "offset",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/transactions.ResTransactions"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/user/accounting/{wallet}": {
             "get": {
                 "description": "Método para obtener una cuenta asociada a una wallet",
@@ -1003,6 +1039,64 @@ const docTemplate = `{
                 },
                 "type": {
                     "type": "integer"
+                }
+            }
+        },
+        "transactions.ResTransactions": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/transactions.Transaction"
+                    }
+                },
+                "error": {
+                    "type": "boolean"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "transactions.Transaction": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "block": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "string"
+                },
+                "from": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "to": {
+                    "type": "string"
+                },
+                "type_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

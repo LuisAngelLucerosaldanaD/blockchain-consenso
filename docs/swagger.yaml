@@ -210,6 +210,44 @@ definitions:
       type:
         type: integer
     type: object
+  transactions.ResTransactions:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/transactions.Transaction'
+        type: array
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  transactions.Transaction:
+    properties:
+      amount:
+        type: number
+      block:
+        type: integer
+      created_at:
+        type: string
+      data:
+        type: string
+      files:
+        type: string
+      from:
+        type: string
+      id:
+        type: string
+      to:
+        type: string
+      type_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
   user.Accounting:
     properties:
       amount:
@@ -608,6 +646,30 @@ paths:
       summary: Método para registrar un participante en la lotería actual
       tags:
       - Participants
+  /api/v1/transactions/all/{limit}/{offset}:
+    get:
+      description: Método para obtener todas las transacciones de la blockchain
+      parameters:
+      - description: Número de transacciones por petición
+        in: path
+        name: limit
+        required: true
+        type: string
+      - description: Salto de transacciones por petición
+        in: path
+        name: offset
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transactions.ResTransactions'
+      summary: Método para obtener todas las transacciones de la blockchain
+      tags:
+      - Transacción
   /api/v1/user/accounting/{wallet}:
     get:
       consumes:

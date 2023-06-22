@@ -11,7 +11,7 @@ func RouterParticipants(app *fiber.App, db *sqlx.DB, txID string) {
 	v1 := api.Group("/v1")
 	trxRouter := v1.Group("/transactions")
 	trxRouter.Post("/create", h.createTransaction)
-	trxRouter.Get("/all", h.getAllTransactions)
+	trxRouter.Get("/all/:limit/:offset", h.getAllTransactions)
 	trxRouter.Get("/all/:block", h.getTransactionsByBlockId)
 	trxRouter.Get("/:id", h.getAllTransactions)
 }
