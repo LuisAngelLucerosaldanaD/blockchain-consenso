@@ -4,8 +4,11 @@ import (
 	"bjungle-consenso/api/handlers/blocks"
 	"bjungle-consenso/api/handlers/miner"
 	"bjungle-consenso/api/handlers/participants"
+	"bjungle-consenso/api/handlers/sign"
+	"bjungle-consenso/api/handlers/transactions"
 	"bjungle-consenso/api/handlers/user"
 	"bjungle-consenso/api/handlers/validator"
+	_ "bjungle-consenso/docs"
 	"github.com/ansrivas/fiberprometheus/v2"
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
@@ -24,6 +27,7 @@ func routes(db *sqlx.DB, loggerHttp bool, allowedOrigins string) *fiber.App {
 
 	app.Get("/swagger/*", swagger.New(swagger.Config{
 		URL:         "/swagger/doc.json",
+		Title:       "BLion Consenso",
 		DeepLinking: false,
 	}))
 
@@ -50,4 +54,6 @@ func loadRoutes(app *fiber.App, db *sqlx.DB, TxID string) {
 	validator.RouterValidators(app, db, TxID)
 	user.RouterUser(app, db, TxID)
 	blocks.RouterBlocks(app, db, TxID)
+	transactions.RouterTransaction(app, db, TxID)
+	sign.RouterSign(app, db, TxID)
 }

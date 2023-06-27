@@ -13,6 +13,7 @@ const docTemplate = `{
         "termsOfService": "https://www.bjungle.net/terms/",
         "contact": {
             "name": "API Support",
+            "url": "https://www.bjungle.net",
             "email": "info@bjungle.net"
         },
         "license": {
@@ -266,6 +267,119 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/sign/create": {
+            "post": {
+                "description": "Método para crear una firma del cuerpo de la transacción",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sign"
+                ],
+                "summary": "Método para crear una firma del cuerpo de la transacción",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Datos para registrar la firma",
+                        "name": "ReqSign",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sign.ReqSign"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sign.ResSign"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/sign/export": {
+            "post": {
+                "description": "Método para exportar firmas por id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sign"
+                ],
+                "summary": "Método para exportar firmas por id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Authorization",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Ids de los registros",
+                        "name": "ReqExportSign",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sign.ReqExportSign"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sign.ResExportSign"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions/all/{block}": {
+            "get": {
+                "description": "Método para obtener todas las transacciones por id del bloque de la blockchain",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transacción"
+                ],
+                "summary": "Método para obtener todas las transacciones por id del bloque",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id del bloque",
+                        "name": "block",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/transactions.ResTransaction"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/transactions/all/{limit}/{offset}": {
             "get": {
                 "description": "Método para obtener todas las transacciones de la blockchain",
@@ -297,6 +411,42 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/transactions.ResTransactions"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/transactions/{trx}/{block}": {
+            "get": {
+                "description": "Método para obtener una transacción de la blockchain por su id y el id del bloque",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transacción"
+                ],
+                "summary": "Método para obtener una transacción de la blockchain",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Id de la transacción",
+                        "name": "trx",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Id del bloque",
+                        "name": "block",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/transactions.ResTransaction"
                         }
                     }
                 }
@@ -1042,6 +1192,99 @@ const docTemplate = `{
                 }
             }
         },
+        "sign.ReqExportSign": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "sign.ReqSign": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
+        "sign.ResExportSign": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sign.Sign"
+                    }
+                },
+                "error": {
+                    "type": "boolean"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sign.ResSign": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "boolean"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sign.Sign": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                }
+            }
+        },
+        "transactions.ResTransaction": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/transactions.Transaction"
+                },
+                "error": {
+                    "type": "boolean"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
         "transactions.ResTransactions": {
             "type": "object",
             "properties": {
@@ -1469,6 +1712,10 @@ const docTemplate = `{
         {
             "description": "Métodos para la gestión de validadores",
             "name": "Validator"
+        },
+        {
+            "description": "Métodos para la gestión de la firma de la transacción",
+            "name": "Sign"
         }
     ]
 }`
@@ -1476,7 +1723,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.1",
-	Host:             "http://172.174.77.149:2054",
+	Host:             "https://sandbox.btigersystem.net/blion/dev/consenso",
 	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "BLion",

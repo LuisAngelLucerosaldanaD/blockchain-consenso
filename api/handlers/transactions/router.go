@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func RouterParticipants(app *fiber.App, db *sqlx.DB, txID string) {
+func RouterTransaction(app *fiber.App, db *sqlx.DB, txID string) {
 	h := handlerTransactions{DB: db, TxID: txID}
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
@@ -13,5 +13,5 @@ func RouterParticipants(app *fiber.App, db *sqlx.DB, txID string) {
 	trxRouter.Post("/create", h.createTransaction)
 	trxRouter.Get("/all/:limit/:offset", h.getAllTransactions)
 	trxRouter.Get("/all/:block", h.getTransactionsByBlockId)
-	trxRouter.Get("/:id", h.getAllTransactions)
+	trxRouter.Get("/:trx/:block", h.getTransactionById)
 }

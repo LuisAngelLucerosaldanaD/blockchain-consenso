@@ -210,6 +210,66 @@ definitions:
       type:
         type: integer
     type: object
+  sign.ReqExportSign:
+    properties:
+      id:
+        items:
+          type: string
+        type: array
+    type: object
+  sign.ReqSign:
+    properties:
+      key:
+        type: string
+    type: object
+  sign.ResExportSign:
+    properties:
+      code:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/sign.Sign'
+        type: array
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  sign.ResSign:
+    properties:
+      code:
+        type: integer
+      data:
+        type: string
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
+  sign.Sign:
+    properties:
+      id:
+        type: string
+      key:
+        type: string
+    type: object
+  transactions.ResTransaction:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/transactions.Transaction'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
   transactions.ResTransactions:
     properties:
       code:
@@ -471,11 +531,12 @@ definitions:
       wallet_id:
         type: string
     type: object
-host: http://172.174.77.149:2054
+host: https://sandbox.btigersystem.net/blion/dev/consenso
 info:
   contact:
     email: info@bjungle.net
     name: API Support
+    url: https://www.bjungle.net
   description: Documentación del API que conecta con el core de BLion
   license:
     name: Software Owner
@@ -646,6 +707,107 @@ paths:
       summary: Método para registrar un participante en la lotería actual
       tags:
       - Participants
+  /api/v1/sign/create:
+    post:
+      consumes:
+      - application/json
+      description: Método para crear una firma del cuerpo de la transacción
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Datos para registrar la firma
+        in: body
+        name: ReqSign
+        required: true
+        schema:
+          $ref: '#/definitions/sign.ReqSign'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sign.ResSign'
+      summary: Método para crear una firma del cuerpo de la transacción
+      tags:
+      - Sign
+  /api/v1/sign/export:
+    post:
+      consumes:
+      - application/json
+      description: Método para exportar firmas por id
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Authorization
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Ids de los registros
+        in: body
+        name: ReqExportSign
+        required: true
+        schema:
+          $ref: '#/definitions/sign.ReqExportSign'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sign.ResExportSign'
+      summary: Método para exportar firmas por id
+      tags:
+      - Sign
+  /api/v1/transactions/{trx}/{block}:
+    get:
+      description: Método para obtener una transacción de la blockchain por su id
+        y el id del bloque
+      parameters:
+      - description: Id de la transacción
+        in: path
+        name: trx
+        required: true
+        type: string
+      - description: Id del bloque
+        in: path
+        name: block
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transactions.ResTransaction'
+      summary: Método para obtener una transacción de la blockchain
+      tags:
+      - Transacción
+  /api/v1/transactions/all/{block}:
+    get:
+      description: Método para obtener todas las transacciones por id del bloque de
+        la blockchain
+      parameters:
+      - description: Id del bloque
+        in: path
+        name: block
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/transactions.ResTransaction'
+      summary: Método para obtener todas las transacciones por id del bloque
+      tags:
+      - Transacción
   /api/v1/transactions/all/{limit}/{offset}:
     get:
       description: Método para obtener todas las transacciones de la blockchain
@@ -960,3 +1122,5 @@ tags:
   name: User
 - description: Métodos para la gestión de validadores
   name: Validator
+- description: Métodos para la gestión de la firma de la transacción
+  name: Sign
