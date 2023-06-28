@@ -12,4 +12,5 @@ func RouterBlocks(app *fiber.App, db *sqlx.DB, txID string) {
 	partRouter := v1.Group("/block")
 	partRouter.Get("/get-all/:limit/:offset", h.GetAllBlocks)
 	partRouter.Get("/current-lottery", h.GetCurrentLottery)
+	partRouter.Get("/:id", h.GetBlockById)
 }

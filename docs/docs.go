@@ -87,6 +87,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/block/{id}": {
+            "get": {
+                "description": "Método para obtener un bloque de la Blockchain por su ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Block"
+                ],
+                "summary": "Método para obtener un bloque de la Blockchain por su ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Id del bloque",
+                        "name": "block",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/blocks.ResBlock"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/miner/block-to-mine": {
             "get": {
                 "description": "Método para obtener el bloque a minar",
@@ -351,16 +383,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/transactions/all/{block}": {
+        "/api/v1/transaction/all/{block}": {
             "get": {
-                "description": "Método para obtener todas las transacciones por id del bloque de la blockchain",
+                "description": "Método para obtener todas las transacciones por el id del bloque de la blockchain",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transacción"
                 ],
-                "summary": "Método para obtener todas las transacciones por id del bloque",
+                "summary": "Método para obtener todas las transacciones por el id del bloque",
                 "parameters": [
                     {
                         "type": "string",
@@ -380,7 +412,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/transactions/all/{limit}/{offset}": {
+        "/api/v1/transaction/all/{limit}/{offset}": {
             "get": {
                 "description": "Método para obtener todas las transacciones de la blockchain",
                 "produces": [
@@ -416,28 +448,21 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/transactions/{trx}/{block}": {
+        "/api/v1/transaction/{trx}": {
             "get": {
-                "description": "Método para obtener una transacción de la blockchain por su id y el id del bloque",
+                "description": "Método para obtener una transacción de la blockchain por su id",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Transacción"
                 ],
-                "summary": "Método para obtener una transacción de la blockchain",
+                "summary": "Método para obtener una transacción de la blockchain por su id",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "Id de la transacción",
                         "name": "trx",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Id del bloque",
-                        "name": "block",
                         "in": "path",
                         "required": true
                     }
@@ -963,6 +988,26 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/blocks.Block"
                     }
+                },
+                "error": {
+                    "type": "boolean"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "blocks.ResBlock": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/blocks.Block"
                 },
                 "error": {
                     "type": "boolean"
@@ -1730,8 +1775,6 @@ var SwaggerInfo = &swag.Spec{
 	Description:      "Documentación del API que conecta con el core de BLion",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
-	LeftDelim:        "{{",
-	RightDelim:       "}}",
 }
 
 func init() {

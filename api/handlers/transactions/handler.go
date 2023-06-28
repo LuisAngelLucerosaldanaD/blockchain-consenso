@@ -32,7 +32,7 @@ func (h *handlerTransactions) createTransaction(c *fiber.Ctx) error {
 // @Param limit path string true "Número de transacciones por petición"
 // @Param offset path string true "Salto de transacciones por petición"
 // @Success 200 {object} ResTransactions
-// @Router /api/v1/transactions/all/{limit}/{offset} [get]
+// @Router /api/v1/transaction/all/{limit}/{offset} [get]
 func (h *handlerTransactions) getAllTransactions(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := ResTransactions{Error: true}
@@ -107,14 +107,13 @@ func (h *handlerTransactions) getAllTransactions(c *fiber.Ctx) error {
 }
 
 // getTransactionById godoc
-// @Summary Método para obtener una transacción de la blockchain
-// @Description Método para obtener una transacción de la blockchain por su id y el id del bloque
+// @Summary Método para obtener una transacción de la blockchain por su id
+// @Description Método para obtener una transacción de la blockchain por su id
 // @tags Transacción
 // @Produce json
 // @Param trx path string true "Id de la transacción"
-// @Param block path string true "Id del bloque"
 // @Success 200 {object} ResTransaction
-// @Router /api/v1/transactions/{trx}/{block} [get]
+// @Router /api/v1/transaction/{trx} [get]
 func (h *handlerTransactions) getTransactionById(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := ResTransaction{Error: true}
@@ -127,19 +126,9 @@ func (h *handlerTransactions) getTransactionById(c *fiber.Ctx) error {
 	defer connTrx.Close()
 
 	trx := c.Params("trx")
-	blockStr := c.Params("block")
-	block, err := strconv.ParseInt(blockStr, 10, 64)
-	if err != nil {
-		logger.Error.Printf("no se pudo obtener el parametro offset")
-		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
 	client := transactions_proto.NewTransactionsServicesClient(connTrx)
-
 	resGrpcTrx, err := client.GetTransactionByID(context.Background(), &transactions_proto.GetTransactionByIdRequest{
-		Id:      trx,
-		BlockId: block,
+		Id: trx,
 	})
 	if err != nil {
 		logger.Error.Printf("no se pudo obtener todas la transaccion, error: %s", err)
@@ -179,13 +168,13 @@ func (h *handlerTransactions) getTransactionById(c *fiber.Ctx) error {
 }
 
 // getTransactionsByBlockId godoc
-// @Summary Método para obtener todas las transacciones por id del bloque
-// @Description Método para obtener todas las transacciones por id del bloque de la blockchain
+// @Summary Método para obtener todas las transacciones por el id del bloque
+// @Description Método para obtener todas las transacciones por el id del bloque de la blockchain
 // @tags Transacción
 // @Produce json
 // @Param block path string true "Id del bloque"
 // @Success 200 {object} ResTransaction
-// @Router /api/v1/transactions/all/{block} [get]
+// @Router /api/v1/transaction/all/{block} [get]
 func (h *handlerTransactions) getTransactionsByBlockId(c *fiber.Ctx) error {
 	e := env.NewConfiguration()
 	res := ResTransactions{Error: true}
