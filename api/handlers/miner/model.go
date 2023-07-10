@@ -43,3 +43,19 @@ type responseHashMined struct {
 	Type  int                           `json:"type"`
 	Msg   string                        `json:"msg"`
 }
+
+type ResponseGetMiner struct {
+	Error bool   `json:"error"`
+	Data  *Miner `json:"data"`
+	Code  int    `json:"code"`
+	Type  int    `json:"type"`
+	Msg   string `json:"msg"`
+}
+
+type Miner struct {
+	Name             string `json:"name"`
+	Lastname         string `json:"lastname"`
+	CreatedAt        string `json:"created_at"`
+	BlocksMined      int64  `json:"blocks_mined"`
+	TransactionsMade int64  `json:"transactions_made"`
+}

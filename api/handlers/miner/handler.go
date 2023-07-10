@@ -190,3 +190,41 @@ func (h *handlerMiner) GetHashMined(c *fiber.Ctx) error {
 	res.Error = false
 	return c.Status(http.StatusOK).JSON(res)
 }
+
+// GetMiner godoc
+// @Summary Método para obtener datos del minero
+// @Description Método para obtener datos del minero
+// @tags Miner
+// @Accept json
+// @Produce json
+// @Success 200 {object} ResponseGetMiner
+// @Router /api/v1/miner/{id} [get]
+func (h *handlerMiner) GetMiner(c *fiber.Ctx) error {
+
+	res := ResponseGetMiner{Error: true}
+	srvBc := bc.NewServerBk(h.DB, nil, h.TxID)
+
+	lottery, code, err := srvBc.SrvLottery.GetLotteryActiveForMined()
+	if err != nil {
+		logger.Error.Printf("couldn't get lottery for mined: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	hashMined, code, err := srvBc.SrvMinerResponse.GetMinerResponseRegister(lottery.ID)
+	if err != nil {
+		logger.Error.Printf("couldn't get hash mined: %v", err)
+		res.Code, res.Type, res.Msg = msg.GetByCode(code, h.DB, h.TxID)
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	if hashMined == nil {
+		logger.Error.Printf("El hash aun no ha sido resuelto por ningun minero")
+		res.Code, res.Type, res.Msg = 22, 1, "El hash aun no ha sido resuelto por ningun minero"
+		return c.Status(http.StatusAccepted).JSON(res)
+	}
+
+	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
+	res.Error = false
+	return c.Status(http.StatusOK).JSON(res)
+}

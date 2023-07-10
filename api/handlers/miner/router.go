@@ -14,4 +14,5 @@ func RouterMiner(app *fiber.App, db *sqlx.DB, txID string) {
 	partRouter.Post("/register-mined", middleware.JWTProtected(), h.RegisterHashMined)
 	partRouter.Get("/block-to-mine", middleware.JWTProtected(), h.GetBlockToMine)
 	partRouter.Get("/hash-mined", h.GetHashMined)
+	partRouter.Get("/:id", h.GetMiner)
 }
