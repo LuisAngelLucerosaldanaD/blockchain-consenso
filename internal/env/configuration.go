@@ -31,6 +31,8 @@ type App struct {
 	LoggerHttp        bool    `json:"logger_http"`
 	Language          string  `json:"language"`
 	MinimumFee        float64 `json:"minimum_fee"`
+	Email             string  `json:"email"`
+	Password          string  `json:"password"`
 }
 
 type DB struct {

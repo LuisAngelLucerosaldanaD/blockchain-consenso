@@ -15,6 +15,7 @@ type PortsServerMinerResponse interface {
 	GetMinerResponseByID(id string) (*MinerResponse, int, error)
 	GetAllMinerResponse() ([]*MinerResponse, error)
 	GetMinerResponseRegister(lotteryID string) (*MinerResponse, int, error)
+	GetTotalMinerResponseByUserId(userID string) ([]*MinerResponse, error)
 }
 
 type service struct {
@@ -101,4 +102,8 @@ func (s *service) GetMinerResponseRegister(lotteryID string) (*MinerResponse, in
 
 func (s *service) GetAllMinerResponse() ([]*MinerResponse, error) {
 	return s.repository.getAll()
+}
+
+func (s *service) GetTotalMinerResponseByUserId(userID string) ([]*MinerResponse, error) {
+	return s.repository.getTotalByUserId(userID)
 }

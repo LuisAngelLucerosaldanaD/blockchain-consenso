@@ -125,3 +125,31 @@ func (s *psql) getRegister(lotteryId string) (*MinerResponse, error) {
 	}
 	return &mdl, nil
 }
+
+func (s *psql) getTotalByUserId(userID string) ([]*MinerResponse, error) {
+	var ms []*MinerResponse
+	const psqlGetTotalByUserId = `SELECT mr.id,
+       mr.lottery_id,
+       mr.participants_id,
+       mr.hash,
+       mr.status,
+       mr.nonce,
+       mr.difficulty,
+       mr.created_at,
+       mr.updated_at
+FROM bc.miner_response mr
+         join bc.participants p on p.id = mr.participants_id
+         join auth.wallets w on w.id = p.wallet_id
+         join auth.user_wallet uw on w.id = uw.id_wallet
+         join auth.users u on u.id = uw.id_user
+         where u.id = $1;
+`
+	err := s.DB.Select(&ms, psqlGetTotalByUserId, userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return ms, err
+	}
+	return ms, nil
+}

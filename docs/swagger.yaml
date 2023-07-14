@@ -114,6 +114,32 @@ definitions:
       timestamp:
         type: string
     type: object
+  miner.Miner:
+    properties:
+      blocks_mined:
+        type: integer
+      created_at:
+        type: string
+      lastname:
+        type: string
+      name:
+        type: string
+      transactions_made:
+        type: integer
+    type: object
+  miner.ResponseGetMiner:
+    properties:
+      code:
+        type: integer
+      data:
+        $ref: '#/definitions/miner.Miner'
+      error:
+        type: boolean
+      msg:
+        type: string
+      type:
+        type: integer
+    type: object
   miner.responseGetBlock:
     properties:
       code:
@@ -620,6 +646,21 @@ paths:
       summary: Método para obtener todos los bloques de la Blockchain
       tags:
       - Block
+  /api/v1/miner/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Método para obtener datos del minero
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/miner.ResponseGetMiner'
+      summary: Método para obtener datos del minero
+      tags:
+      - Miner
   /api/v1/miner/block-to-mine:
     get:
       consumes:

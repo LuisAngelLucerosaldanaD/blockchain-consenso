@@ -21,13 +21,13 @@ emitir credenciales.
 ## Casos de uso
 
 * Se requiere para la creación de credenciales mediante la información que el ente emisor y/o certificador provea al servicio
-* Se requiere poder obtener las credenciales por categoria
+* Se requiere poder obtener las credenciales por categoría
 * Se requiere poder obtener todas las credenciales de un usuario
-* Se requiere poder crear categorias con las que se podrá organizar las credenciales
+* Se requiere poder crear categorías con las que se podrá organizar las credenciales
 * Se requiere poder crear un usuario
 * Se requiere poder iniciar sesión con un usuario ya existente
 * Se requiere poder obtener los datos de un usuario (Nombres, apellidos, número de identification, foto, etc.)
-* Se requiere poder guardas la información de customisación de una credencial con respecto a lo que un ente emisor/certificador envie o requiera
+* Se requiere poder guardas la información de customisación de una credencial con respecto a lo que un ente emisor/certificador envíe o requiera
 
 ## Casos de uso no soportados
 
@@ -48,7 +48,7 @@ El presente diagrama muestra el modelo de datos que se utiliza para el servicio.
 
 ## Limitaciones
 
-Este servicio presenta las siguientes limitaciones con respecto a sus funciones y/o caracteristicas:
+Este servicio presenta las siguientes limitaciones con respecto a sus funciones y/o características:
 
 * Solo se Puede ejecutar en la BLion Virtual Smart
 
@@ -60,7 +60,7 @@ Dichos costos o aproximados se pueden obtener de la siguiente en el simulador de
 
 ## Instalación y Ejecución
 Este servicio está construido para correr en la BLion Virtual Smart de BLion Blockchain por ende tiene que pasar por regulaciones y aprobaciones para poderse instalar y ejecutar 
-en la red de BLion. Para Mayor información sobre los `Smart Contract` en BLion consulte la siguiente página [BLion](https://www.bjungle.net).
+en la red de BLion. Para Mayor información sobre los `Smart Contract` en BLion, consulte la siguiente página [BLion](https://www.bjungle.net).
 
 ## Instalación y Ejecución
 
@@ -72,12 +72,12 @@ que se encuentran junto a este archivo. Para generar dichos ejecutables se deben
 ##### Linux
 
 ````bash
-    GOOS=linux  GOARCH=amd64 go build
+GOOS=linux  GOARCH=amd64 go build
 ````
 
 ##### Windows
 
 ````bash
-    GOOS=windows  GOARCH=amd64 go build
+GOOS=windows  GOARCH=amd64 go build
 ````
 

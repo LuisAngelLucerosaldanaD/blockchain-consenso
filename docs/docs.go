@@ -217,6 +217,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/miner/{id}": {
+            "get": {
+                "description": "Método para obtener datos del minero",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Miner"
+                ],
+                "summary": "Método para obtener datos del minero",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/miner.ResponseGetMiner"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/participants/info/{wallet}": {
             "get": {
                 "description": "Método para obtener la información de un participante por su wallet id",
@@ -1066,6 +1089,46 @@ const docTemplate = `{
                 },
                 "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "miner.Miner": {
+            "type": "object",
+            "properties": {
+                "blocks_mined": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "transactions_made": {
+                    "type": "integer"
+                }
+            }
+        },
+        "miner.ResponseGetMiner": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/miner.Miner"
+                },
+                "error": {
+                    "type": "boolean"
+                },
+                "msg": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "integer"
                 }
             }
         },

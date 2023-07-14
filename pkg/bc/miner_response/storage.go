@@ -18,6 +18,7 @@ type ServicesMinerResponseRepository interface {
 	getByID(id string) (*MinerResponse, error)
 	getAll() ([]*MinerResponse, error)
 	getRegister(lotteryId string) (*MinerResponse, error)
+	getTotalByUserId(userID string) ([]*MinerResponse, error)
 }
 
 func FactoryStorage(db *sqlx.DB, user *models.User, txID string) ServicesMinerResponseRepository {
