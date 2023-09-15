@@ -2,10 +2,7 @@ package miner
 
 import (
 	"bjungle-consenso/internal/env"
-	"bjungle-consenso/internal/grpc/auth_proto"
 	"bjungle-consenso/internal/grpc/mine_proto"
-	"bjungle-consenso/internal/grpc/users_proto"
-	"bjungle-consenso/internal/grpc/wallet_proto"
 	"bjungle-consenso/internal/logger"
 	"bjungle-consenso/internal/msg"
 	"bjungle-consenso/pkg/bc"
@@ -189,101 +186,6 @@ func (h *handlerMiner) GetHashMined(c *fiber.Ctx) error {
 	}
 
 	res.Data = hashMined
-	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
-	res.Error = false
-	return c.Status(http.StatusOK).JSON(res)
-}
-
-// GetMiner godoc
-// @Summary Método para obtener datos del minero
-// @Description Método para obtener datos del minero
-// @tags Miner
-// @Accept json
-// @Produce json
-// @Success 200 {object} ResponseGetMiner
-// @Router /api/v1/miner/{id} [get]
-func (h *handlerMiner) GetMiner(c *fiber.Ctx) error {
-
-	res := ResponseGetMiner{Error: true}
-	srvBc := bc.NewServerBk(h.DB, nil, h.TxID)
-	id := c.Params("id")
-	if id == "" {
-		logger.Error.Printf("El id del minero es requerido")
-		res.Code, res.Type, res.Msg = msg.GetByCode(1, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	e := env.NewConfiguration()
-	connAuth, err := grpc.Dial(e.AuthService.Port, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		logger.Error.Printf("error conectando con el servicio auth de blockchain: %s", err)
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-	defer connAuth.Close()
-
-	userClient := users_proto.NewAuthServicesUsersClient(connAuth)
-	authClient := auth_proto.NewAuthServicesUsersClient(connAuth)
-	authWallet := wallet_proto.NewWalletServicesWalletClient(connAuth)
-
-	resAuth, err := authClient.Login(context.Background(), &auth_proto.LoginRequest{
-		Email:    &e.App.Email,
-		Nickname: nil,
-		Password: e.App.Password,
-	})
-	if err != nil {
-		logger.Error.Printf("No se pudo autenticar, error: %s", err)
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-	if resAuth.Error {
-		logger.Error.Printf(resAuth.Msg)
-		res.Code, res.Type, res.Msg = msg.GetByCode(int(resAuth.Code), h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", resAuth.Data.AccessToken)
-
-	wallet, err := authWallet.GetWalletById(ctx, &wallet_proto.RequestGetWalletById{Id: id})
-	if err != nil {
-		logger.Error.Printf("No se pudo traer los datos de la wallet, error: %s", err)
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	if wallet.Error {
-		logger.Error.Printf(wallet.Msg)
-		res.Code, res.Type, res.Msg = msg.GetByCode(int(wallet.Code), h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	miner, err := userClient.GetUserByIdentityNumber(ctx, &users_proto.RqGetUserByIdentityNumber{IdentityNumber: wallet.Data.IdentityNumber})
-	if err != nil {
-		logger.Error.Printf("No se pudo traer los datos del minero, error: %s", err)
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	if miner.Error {
-		logger.Error.Printf(miner.Msg)
-		res.Code, res.Type, res.Msg = msg.GetByCode(int(miner.Code), h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	resMined, err := srvBc.SrvMinerResponse.GetTotalMinerResponseByUserId(miner.Data.Id)
-	if err != nil {
-		logger.Error.Printf("No se pudo contar el total de bloques minados, error: %s", err)
-		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
-		return c.Status(http.StatusAccepted).JSON(res)
-	}
-
-	res.Data = &Miner{
-		Name:             miner.Data.Name,
-		Lastname:         miner.Data.Lastname,
-		CreatedAt:        miner.Data.CreatedAt,
-		BlocksMined:      int64(len(resMined)),
-		TransactionsMade: 0,
-	}
 	res.Code, res.Type, res.Msg = msg.GetByCode(29, h.DB, h.TxID)
 	res.Error = false
 	return c.Status(http.StatusOK).JSON(res)

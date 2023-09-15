@@ -80,8 +80,9 @@ func (h *handlerParticipant) RegisterParticipant(c *fiber.Ctx) error {
 	token := c.Get("Authorization")[7:]
 	ctx := grpcMetadata.AppendToOutgoingContext(context.Background(), "authorization", token)
 
-	resWallet, err := clientWallet.GetWalletByUserId(ctx, &wallet_proto.RequestGetWalletByUserId{UserId: u.ID})
+	resWallet, err := clientWallet.GetWalletByIdentityNumber(ctx, &wallet_proto.RqGetByIdentityNumber{IdentityNumber: u.IdNumber})
 	if err != nil {
+		logger.Error.Printf("couldn't get wallet by user id, error: %s", err)
 		logger.Error.Printf("couldn't get wallet by user id, error: %s", err)
 		res.Code, res.Type, res.Msg = msg.GetByCode(22, h.DB, h.TxID)
 		return c.Status(http.StatusAccepted).JSON(res)
